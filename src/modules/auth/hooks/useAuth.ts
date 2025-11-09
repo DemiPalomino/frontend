@@ -1,4 +1,4 @@
-// src/modules/auth/hooks/useAuth.ts
+
 import { useState, useEffect } from "react";
 import { LoginService, logoutService, LoginResponse } from "../services/LoginService";
 
