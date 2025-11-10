@@ -20,9 +20,9 @@ export interface CreateEmpleadoDTO {
   nombres: string;
   apellidos: string;
   email: string;
-  phone: string;
-  fecha_nace: string;
-  id_area: number;
+  telefono: string; // ✅ Cambiado de 'phone' a 'telefono'
+  fecha_nacimiento: string; // ✅ Cambiado de 'fecha_nace' a 'fecha_nacimiento'
+  id_area_trabajo: number; // ✅ Cambiado de 'id_area' a 'id_area_trabajo'
 }
 
 export const empleadoService = {
@@ -37,7 +37,7 @@ export const empleadoService = {
 
   getById: async (id: number): Promise<Empleado> => {
     try {
-      return await apiFetch(`/persona/${id}`);
+      return await apiFetch(`/personas/${id}`); // ✅ Corregido: /personas/ en lugar de /persona/
     } catch (error) {
       console.error(`Error fetching empleado ${id}:`, error);
       throw new Error('No se pudo cargar el empleado');
@@ -58,7 +58,7 @@ export const empleadoService = {
 
   update: async (id: number, empleado: Partial<Empleado>): Promise<Empleado> => {
     try {
-      return await apiFetch(`/persona/${id}`, {
+      return await apiFetch(`/personas/${id}`, { // ✅ Corregido: /personas/ en lugar de /persona/
         method: "PUT",
         body: JSON.stringify(empleado),
       });
@@ -70,7 +70,7 @@ export const empleadoService = {
 
   remove: async (id: number): Promise<void> => {
     try {
-      await apiFetch(`/persona/${id}`, {
+      await apiFetch(`/personas/${id}`, { // ✅ Corregido: /personas/ en lugar de /persona/
         method: "DELETE",
       });
     } catch (error) {
@@ -78,5 +78,4 @@ export const empleadoService = {
       throw new Error('No se pudo eliminar el empleado');
     }
   },
-
 };

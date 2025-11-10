@@ -1,20 +1,30 @@
 import React, { useState } from 'react';
 import { useEmpleado } from '../controllers/useEmpleado';
+import { EmpleadoModal } from '../components/EmpleadoModal'; 
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card';
 import { Button } from '../../../components/ui/button';
 import { Input } from '../../../components/ui/input';
 import { Badge } from '../../../components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../../components/ui/table';
-import { Users, Plus, Search, Edit, Eye, Mail, Phone, Calendar, Building } from 'lucide-react';
+import {
+  Users, Plus, Search, Edit, Trash, Mail, Phone, Calendar, Building,
+  Eye, UserPlus
+} from 'lucide-react';
 
 export const EmpleadoPage: React.FC = () => {
-  const { 
-    empleados, 
-    loading, 
-    error 
+  const {
+    empleados,
+    loading,
+    error,
+    crearEmpleado,
+    actualizarEmpleado,
+    eliminarEmpleado,
+    toggleActivo
   } = useEmpleado();
 
   const [searchTerm, setSearchTerm] = useState('');
+  const [modalAbierto, setModalAbierto] = useState(false);
+  const [empleadoEditando, setEmpleadoEditando] = useState<any>(null);
 
   const filteredEmployees = empleados.filter(empleado =>
     empleado.nombres.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -24,13 +34,60 @@ export const EmpleadoPage: React.FC = () => {
   );
 
   const getAreaName = (areaId: number) => {
-    const areas = {
-      1: 'Desarrollo',
-      2: 'Marketing',
-      3: 'Recursos Humanos', 
-      4: 'Administración'
+    const areas: { [key: number]: string } = {
+      1: 'Administración',
+      2: 'Recursos Humanos',
+      3: 'Contabilidad',
+      4: 'Sistemas',
+      5: 'Ventas'
     };
-    return areas[areaId as keyof typeof areas] || 'Sin área';
+    return areas[areaId] || 'Sin área';
+  };
+
+  const handleCrearEmpleado = async (empleadoData: any) => {
+    await crearEmpleado(empleadoData);
+    setModalAbierto(false);
+  };
+
+  const handleEditarEmpleado = async (empleadoData: any) => {
+    if (empleadoEditando) {
+      await actualizarEmpleado(empleadoEditando.id_persona, empleadoData);
+      setModalAbierto(false);
+      setEmpleadoEditando(null);
+    }
+  };
+
+  const handleEliminarEmpleado = async (id: number) => {
+    if (window.confirm('¿Estás seguro de que deseas eliminar este empleado?')) {
+      try {
+        await eliminarEmpleado(id);
+      } catch (error) {
+        console.error('Error al eliminar empleado:', error);
+      }
+    }
+  };
+
+  const handleToggleActivo = async (id: number, activoActual: boolean) => {
+    try {
+      await toggleActivo(id, !activoActual);
+    } catch (error) {
+      console.error('Error al cambiar estado:', error);
+    }
+  };
+
+  const abrirModalCrear = () => {
+    setEmpleadoEditando(null);
+    setModalAbierto(true);
+  };
+
+  const abrirModalEditar = (empleado: any) => {
+    setEmpleadoEditando(empleado);
+    setModalAbierto(true);
+  };
+
+  const cerrarModal = () => {
+    setModalAbierto(false);
+    setEmpleadoEditando(null);
   };
 
   if (loading) {
@@ -59,14 +116,22 @@ export const EmpleadoPage: React.FC = () => {
 
   return (
     <div className="p-6 space-y-6">
+      {/* Modal */}
+      <EmpleadoModal
+        isOpen={modalAbierto}
+        onClose={cerrarModal}
+        onSave={empleadoEditando ? handleEditarEmpleado : handleCrearEmpleado}
+        empleado={empleadoEditando}
+      />
+
       {/* Header */}
       <div className="flex justify-between items-center border-b border-gray-200 pb-4">
         <div>
           <h1 className="text-2xl font-semibold text-gray-900">Gestión de Empleados</h1>
           <p className="text-gray-600">Administra la información de los empleados de la empresa</p>
         </div>
-        <Button>
-          <Plus className="w-4 h-4 mr-2" />
+        <Button onClick={abrirModalCrear}>
+          <UserPlus className="w-4 h-4 mr-2" />
           Nuevo Empleado
         </Button>
       </div>
@@ -126,21 +191,21 @@ export const EmpleadoPage: React.FC = () => {
           ) : (
             <div className="overflow-x-auto">
               <Table>
-                <thead>
-                  <tr className="border-b border-gray-200">
-                    <th className="text-left py-3 px-4">Empleado</th>
-                    <th className="text-left py-3 px-4">DNI</th>
-                    <th className="text-left py-3 px-4">Contacto</th>
-                    <th className="text-left py-3 px-4">Área</th>
-                    <th className="text-left py-3 px-4">Fecha Ingreso</th>
-                    <th className="text-left py-3 px-4">Estado</th>
-                    <th className="text-left py-3 px-4">Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Empleado</TableHead>
+                    <TableHead>DNI</TableHead>
+                    <TableHead>Contacto</TableHead>
+                    <TableHead>Área</TableHead>
+                    <TableHead>Fecha Ingreso</TableHead>
+                    <TableHead>Estado</TableHead>
+                    <TableHead>Acciones</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
                   {filteredEmployees.map((empleado) => (
-                    <tr key={empleado.id_persona} className="border-b border-gray-100 hover:bg-gray-50">
-                      <td className="py-4 px-4">
+                    <TableRow key={`empleado-${empleado.id_persona}`}>
+                      <TableCell>
                         <div className="flex items-center space-x-3">
                           <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
                             <Users className="w-5 h-5 text-gray-600" />
@@ -150,9 +215,9 @@ export const EmpleadoPage: React.FC = () => {
                             <p className="text-sm text-gray-500">{empleado.email}</p>
                           </div>
                         </div>
-                      </td>
-                      <td className="py-4 px-4">{empleado.dni}</td>
-                      <td className="py-4 px-4">
+                      </TableCell>
+                      <TableCell>{empleado.dni}</TableCell>
+                      <TableCell>
                         <div className="text-sm">
                           <p className="flex items-center">
                             <Mail className="w-3 h-3 mr-1" />
@@ -163,34 +228,46 @@ export const EmpleadoPage: React.FC = () => {
                             {empleado.telefono}
                           </p>
                         </div>
-                      </td>
-                      <td className="py-4 px-4">
+                      </TableCell>
+                      <TableCell>
                         <Badge variant="outline">{getAreaName(empleado.id_area_trabajo)}</Badge>
-                      </td>
-                      <td className="py-4 px-4">
+                      </TableCell>
+                      <TableCell>
                         <div className="flex items-center text-sm">
                           <Calendar className="w-3 h-3 mr-1" />
                           {new Date(empleado.fecha_ingreso).toLocaleDateString('es-ES')}
                         </div>
-                      </td>
-                      <td className="py-4 px-4">
-                        <Badge variant={empleado.activo ? "default" : "outline"} className={empleado.activo ? "bg-green-500" : ""}>
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant={empleado.activo ? "default" : "outline"}
+                          className={empleado.activo ? "bg-green-500 hover:bg-green-600" : "bg-gray-100"}
+                          onClick={() => handleToggleActivo(empleado.id_persona, empleado.activo)}
+                        >
                           {empleado.activo ? 'Activo' : 'Inactivo'}
                         </Badge>
-                      </td>
-                      <td className="py-4 px-4">
+                      </TableCell>
+                      <TableCell>
                         <div className="flex space-x-2">
-                          <Button size="sm" variant="outline">
-                            <Eye className="w-3 h-3" />
-                          </Button>
-                          <Button size="sm" variant="outline">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => abrirModalEditar(empleado)}
+                          >
                             <Edit className="w-3 h-3" />
                           </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleEliminarEmpleado(empleado.id_persona)}
+                          >
+                            <Trash className="w-3 h-3" />
+                          </Button>
                         </div>
-                      </td>
-                    </tr>
+                      </TableCell>
+                    </TableRow>
                   ))}
-                </tbody>
+                </TableBody>
               </Table>
             </div>
           )}
@@ -199,4 +276,5 @@ export const EmpleadoPage: React.FC = () => {
     </div>
   );
 };
+
 export default EmpleadoPage;

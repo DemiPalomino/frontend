@@ -20,10 +20,15 @@ export const useEmpleado = () => {
     }
   };
 
-  const crearEmpleado = async (empleado: CreateEmpleadoDTO) => {
+  const crearEmpleado = async (empleadoData: CreateEmpleadoDTO) => {
     try {
       setError(null);
-      const nuevoEmpleado = await empleadoService.create(empleado);
+      // ✅ Asegurar que los campos tengan el nombre correcto
+      const empleadoParaBackend = {
+        ...empleadoData,
+        // No necesita mapeo si ya usamos los nombres correctos en CreateEmpleadoDTO
+      };
+      const nuevoEmpleado = await empleadoService.create(empleadoParaBackend);
       setEmpleados(prev => [...prev, nuevoEmpleado]);
       return nuevoEmpleado;
     } catch (err: any) {
@@ -37,7 +42,7 @@ export const useEmpleado = () => {
       setError(null);
       const empleadoActualizado = await empleadoService.update(id, empleado);
       setEmpleados(prev => prev.map(emp => 
-        emp.id_persona === id ? empleadoActualizado : emp
+        emp.id_persona === id ? { ...emp, ...empleadoActualizado } : emp
       ));
       return empleadoActualizado;
     } catch (err: any) {
