@@ -3,8 +3,8 @@ import { apiFetch } from "../../../app/service/api";
 export interface Horario {
   id_horario: number;
   nombre_horario: string;
-  fecha_inicio: string;
-  fecha_fin: string;
+  hora_entrada: string;  // ✅ CAMBIADO: de fecha_inicio a hora_entrada
+  hora_salida: string;   // ✅ CAMBIADO: de fecha_fin a hora_salida
   id_area_trabajo: number;
   estado: number;
   nombre_area?: string;
@@ -12,8 +12,8 @@ export interface Horario {
 
 export interface CreateHorarioDTO {
   nombre_horario: string;
-  fecha_inicio: string;
-  fecha_fin: string;
+  hora_entrada: string;  // ✅ CAMBIADO
+  hora_salida: string;   // ✅ CAMBIADO
   id_area_trabajo: number;
   estado?: number;
 }
@@ -30,7 +30,7 @@ export const horarioService = {
 
   getById: async (id: number): Promise<Horario> => {
     try {
-      return await apiFetch(`/horario/${id}`);
+      return await apiFetch(`/horarios/${id}`);
     } catch (error) {
       console.error(`Error fetching horario ${id}:`, error);
       throw new Error('No se pudo cargar el horario');
@@ -51,7 +51,7 @@ export const horarioService = {
 
   update: async (id: number, horario: Partial<Horario>): Promise<Horario> => {
     try {
-      return await apiFetch(`/horario/${id}`, {
+      return await apiFetch(`/horarios/${id}`, {
         method: "PUT",
         body: JSON.stringify(horario),
       });
@@ -63,7 +63,7 @@ export const horarioService = {
 
   remove: async (id: number): Promise<void> => {
     try {
-      await apiFetch(`/horario/${id}`, {
+      await apiFetch(`/horarios/${id}`, {
         method: "DELETE",
       });
     } catch (error) {

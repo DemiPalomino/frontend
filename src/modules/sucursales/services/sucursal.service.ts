@@ -1,3 +1,4 @@
+// src/modules/sucursales/services/sucursal.service.ts - CORREGIDO
 import { apiFetch } from "../../../app/service/api";
 
 export interface Sucursal {
@@ -14,7 +15,8 @@ export interface AreaTrabajo {
   id_area: number;
   nombre_area: string;
   descripcion: string;
-  id_sucursal?: number;
+  id_sucursal: number;
+  
 }
 
 export interface CreateSucursalDTO {
@@ -27,14 +29,14 @@ export interface CreateSucursalDTO {
 export interface CreateAreaDTO {
   nombre_area: string;
   descripcion: string;
-  id_sucursal?: number;
+
 }
 
 export const sucursalService = {
-  // Sucursales
+  // ✅ CORREGIDO: Rutas actualizadas
   getSucursales: async (): Promise<Sucursal[]> => {
     try {
-      return await apiFetch("/sucursals");
+      return await apiFetch("/sucursales");  // ✅ "sucursales" en plural
     } catch (error) {
       console.error('Error fetching sucursales:', error);
       throw new Error('No se pudieron cargar las sucursales');
@@ -43,7 +45,7 @@ export const sucursalService = {
 
   getSucursalById: async (id: number): Promise<Sucursal> => {
     try {
-      return await apiFetch(`/sucursal/${id}`);
+      return await apiFetch(`/sucursales/${id}`);  // ✅ "sucursales" en plural
     } catch (error) {
       console.error(`Error fetching sucursal ${id}:`, error);
       throw new Error('No se pudo cargar la sucursal');
@@ -52,7 +54,7 @@ export const sucursalService = {
 
   createSucursal: async (sucursal: CreateSucursalDTO): Promise<Sucursal> => {
     try {
-      return await apiFetch("/sucursals", {
+      return await apiFetch("/sucursales", {  // ✅ "sucursales" en plural
         method: "POST",
         body: JSON.stringify(sucursal),
       });
@@ -64,7 +66,7 @@ export const sucursalService = {
 
   updateSucursal: async (id: number, sucursal: Partial<Sucursal>): Promise<Sucursal> => {
     try {
-      return await apiFetch(`/sucursal/${id}`, {
+      return await apiFetch(`/sucursales/${id}`, {  // ✅ "sucursales" en plural
         method: "PUT",
         body: JSON.stringify(sucursal),
       });
@@ -76,7 +78,7 @@ export const sucursalService = {
 
   deleteSucursal: async (id: number): Promise<void> => {
     try {
-      await apiFetch(`/sucursal/${id}`, {
+      await apiFetch(`/sucursales/${id}`, {  // ✅ "sucursales" en plural
         method: "DELETE",
       });
     } catch (error) {
@@ -85,10 +87,10 @@ export const sucursalService = {
     }
   },
 
-  // Áreas de Trabajo
+  // ✅ CORREGIDO: Rutas para áreas
   getAreas: async (): Promise<AreaTrabajo[]> => {
     try {
-      return await apiFetch("/areas");
+      return await apiFetch("/areas");  // ✅ Ruta correcta
     } catch (error) {
       console.error('Error fetching areas:', error);
       throw new Error('No se pudieron cargar las áreas');
@@ -97,7 +99,7 @@ export const sucursalService = {
 
   getAreaById: async (id: number): Promise<AreaTrabajo> => {
     try {
-      return await apiFetch(`/area/${id}`);
+      return await apiFetch(`/areas/${id}`);  // ✅ Ruta correcta
     } catch (error) {
       console.error(`Error fetching area ${id}:`, error);
       throw new Error('No se pudo cargar el área');
@@ -106,7 +108,7 @@ export const sucursalService = {
 
   createArea: async (area: CreateAreaDTO): Promise<AreaTrabajo> => {
     try {
-      return await apiFetch("/areas", {
+      return await apiFetch("/areas", {  // ✅ Ruta correcta
         method: "POST",
         body: JSON.stringify(area),
       });
@@ -118,7 +120,7 @@ export const sucursalService = {
 
   updateArea: async (id: number, area: Partial<AreaTrabajo>): Promise<AreaTrabajo> => {
     try {
-      return await apiFetch(`/area/${id}`, {
+      return await apiFetch(`/areas/${id}`, {  // ✅ Ruta correcta
         method: "PUT",
         body: JSON.stringify(area),
       });
@@ -130,7 +132,7 @@ export const sucursalService = {
 
   deleteArea: async (id: number): Promise<void> => {
     try {
-      await apiFetch(`/area/${id}`, {
+      await apiFetch(`/areas/${id}`, {  // ✅ Ruta correcta
         method: "DELETE",
       });
     } catch (error) {

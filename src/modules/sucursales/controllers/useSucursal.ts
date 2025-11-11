@@ -69,16 +69,24 @@ export const useSucursal = () => {
     }
   };
 
-  const actualizarArea = async (id: number, area: Partial<AreaTrabajo>) => {
-    try {
-      const areaActualizada = await sucursalService.updateArea(id, area);
-      setAreas(prev => prev.map(a => a.id_area === id ? areaActualizada : a));
-      return areaActualizada;
-    } catch (err: any) {
-      setError(err.message);
-      throw err;
-    }
-  };
+ // En useSucursal.ts - Mejorar la función de actualización
+const actualizarArea = async (id: number, area: Partial<AreaTrabajo>) => {
+  try {
+    // ✅ Asegurar que los datos estén completos
+    const datosCompletos = {
+      nombre_area: area.nombre_area || '',
+      descripcion: area.descripcion || '',
+      id_sucursal: area.id_sucursal || 0
+    };
+    
+    const areaActualizada = await sucursalService.updateArea(id, datosCompletos);
+    setAreas(prev => prev.map(a => a.id_area === id ? areaActualizada : a));
+    return areaActualizada;
+  } catch (err: any) {
+    setError(err.message);
+    throw err;
+  }
+};
 
   const eliminarArea = async (id: number) => {
     try {

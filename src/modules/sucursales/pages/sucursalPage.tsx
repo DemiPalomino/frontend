@@ -13,10 +13,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Building2, MapPin, Phone, Plus, Edit, Trash2, Briefcase } from 'lucide-react';
 
 export const SucursalPage: React.FC = () => {
-  const { 
-    sucursales, 
-    areas, 
-    loading, 
+  const {
+    sucursales,
+    areas,
+    loading,
     error,
     crearSucursal,
     actualizarSucursal,
@@ -59,19 +59,32 @@ export const SucursalPage: React.FC = () => {
     }
   };
 
-  const handleSaveArea = async () => {
-    try {
-      if (editingArea) {
-        await actualizarArea(editingArea.id_area, nuevaArea);
-      } else {
-        await crearArea(nuevaArea);
-      }
-      setIsAreaDialogOpen(false);
-      resetAreaForm();
-    } catch (error) {
-      console.error('Error al guardar área:', error);
+const handleSaveArea = async () => {
+  try {
+    // ✅ Validaciones
+    if (!nuevaArea.nombre_area.trim()) {
+      alert('El nombre del área es requerido');
+      return;
     }
-  };
+    if (nuevaArea.id_sucursal === 0) {
+      alert('Debe seleccionar una sucursal');
+      return;
+    }
+
+    // ✅ FALTABA ESTA PARTE CRÍTICA:
+    if (editingArea) {
+      await actualizarArea(editingArea.id_area, nuevaArea);
+    } else {
+      await crearArea(nuevaArea);
+    }
+    
+    setIsAreaDialogOpen(false);
+    resetAreaForm();
+  } catch (error: any) {
+    console.error('Error al guardar área:', error);
+    alert('Error al guardar el área: ' + error.message);
+  }
+};
 
   const handleEditSucursal = (sucursal: any) => {
     setEditingSucursal(sucursal);
@@ -83,12 +96,13 @@ export const SucursalPage: React.FC = () => {
     setIsSucursalDialogOpen(true);
   };
 
+  // En sucursalPage.tsx - Mejorar la función de edición
   const handleEditArea = (area: any) => {
     setEditingArea(area);
     setNuevaArea({
-      nombre_area: area.nombre_area,
-      descripcion: area.descripcion,
-      id_sucursal: area.id_sucursal,
+      nombre_area: area.nombre_area || '',
+      descripcion: area.descripcion || '',
+      id_sucursal: area.id_sucursal || 0, // ✅ Valor por defecto
     });
     setIsAreaDialogOpen(true);
   };
@@ -325,9 +339,13 @@ export const SucursalPage: React.FC = () => {
                     <div className="space-y-4 py-4">
                       <div className="space-y-2">
                         <Label htmlFor="sucursal">Sucursal *</Label>
+                        
                         <Select
-                          value={nuevaArea.id_sucursal.toString()}
-                          onValueChange={(value: string) => setNuevaArea({ ...nuevaArea, id_sucursal: parseInt(value) })}
+                          value={nuevaArea.id_sucursal?.toString() || ""} // ✅ Safe navigation
+                          onValueChange={(value: string) => setNuevaArea({
+                            ...nuevaArea,
+                            id_sucursal: value ? parseInt(value) : 0
+                          })}
                         >
                           <SelectTrigger>
                             <SelectValue placeholder="Seleccione una sucursal" />
@@ -397,7 +415,7 @@ export const SucursalPage: React.FC = () => {
                       <TableCell>
                         <div className="flex items-center gap-2">
                           <Building2 className="h-4 w-4 text-muted-foreground" />
-                          {getSucursalNombre(area.id_sucursal ?? 0)}
+                          {getSucursalNombre(area.id_sucursal)}
                         </div>
                       </TableCell>
                       <TableCell>

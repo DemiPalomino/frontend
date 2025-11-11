@@ -8,9 +8,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Label } from '../../../components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../components/ui/select';
 import { Switch } from '../../../components/ui/switch';
-import { 
-  Clock, 
-  Plus, 
+import {
+  Clock,
+  Plus,
   Edit,
   Settings,
   Users,
@@ -18,13 +18,13 @@ import {
 } from 'lucide-react';
 
 export const HorariosPage: React.FC = () => {
-  const { 
-    horarios, 
-    loading, 
+  const {
+    horarios,
+    loading,
     error,
     crearHorario,
     actualizarHorario,
-    toggleEstadoHorario 
+    toggleEstadoHorario
   } = useHorario();
 
   const [showCreateDialog, setShowCreateDialog] = useState(false);
@@ -33,8 +33,8 @@ export const HorariosPage: React.FC = () => {
 
   const [nuevoHorario, setNuevoHorario] = useState({
     nombre_horario: '',
-    fecha_inicio: '08:00',
-    fecha_fin: '17:00',
+    hora_entrada: '08:00',  // ✅ CAMBIADO: de fecha_inicio
+    hora_salida: '17:00', 
     id_area_trabajo: 0,
     estado: 1
   });
@@ -58,8 +58,8 @@ export const HorariosPage: React.FC = () => {
     setSelectedSchedule(horario);
     setNuevoHorario({
       nombre_horario: horario.nombre_horario,
-      fecha_inicio: horario.fecha_inicio,
-      fecha_fin: horario.fecha_fin,
+      hora_entrada: horario.hora_entrada,  // ✅ CAMBIADO
+      hora_salida: horario.hora_salida,    // ✅ CAMBIADO
       id_area_trabajo: horario.id_area_trabajo,
       estado: horario.estado
     });
@@ -90,8 +90,8 @@ export const HorariosPage: React.FC = () => {
   const resetHorarioForm = () => {
     setNuevoHorario({
       nombre_horario: '',
-      fecha_inicio: '08:00',
-      fecha_fin: '17:00',
+      hora_entrada: '08:00',
+      hora_salida: '17:00',
       id_area_trabajo: 0,
       estado: 1
     });
@@ -100,10 +100,11 @@ export const HorariosPage: React.FC = () => {
 
   const getAreaName = (areaId: number) => {
     const areas = {
-      1: 'Desarrollo',
-      2: 'Marketing', 
-      3: 'Recursos Humanos',
-      4: 'Administración'
+      1: 'Administración',
+      2: 'Recursos Humanos',
+      3: 'Contabilidad',
+      4: 'Sistemas',
+      5: 'Ventas'
     };
     return areas[areaId as keyof typeof areas] || 'Sin área';
   };
@@ -157,19 +158,19 @@ export const HorariosPage: React.FC = () => {
             <div className="space-y-4">
               <div>
                 <Label htmlFor="schedule-name">Nombre del Horario</Label>
-                <Input 
-                  id="schedule-name" 
+                <Input
+                  id="schedule-name"
                   value={nuevoHorario.nombre_horario}
-                  onChange={(e) => setNuevoHorario({...nuevoHorario, nombre_horario: e.target.value})}
-                  placeholder="Ej: Horario Matutino" 
+                  onChange={(e) => setNuevoHorario({ ...nuevoHorario, nombre_horario: e.target.value })}
+                  placeholder="Ej: Horario Matutino"
                 />
               </div>
 
               <div>
                 <Label htmlFor="area">Área de Trabajo</Label>
-                <Select 
-                  value={nuevoHorario.id_area_trabajo.toString()} 
-                  onValueChange={(value: string) => setNuevoHorario({...nuevoHorario, id_area_trabajo: parseInt(value)})}
+                <Select
+                  value={nuevoHorario.id_area_trabajo.toString()}
+                  onValueChange={(value: string) => setNuevoHorario({ ...nuevoHorario, id_area_trabajo: parseInt(value) })}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Selecciona un área" />
@@ -186,29 +187,29 @@ export const HorariosPage: React.FC = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="start-time">Hora de Inicio</Label>
-                  <Input 
-                    id="start-time" 
-                    type="time" 
-                    value={nuevoHorario.fecha_inicio}
-                    onChange={(e) => setNuevoHorario({...nuevoHorario, fecha_inicio: e.target.value})}
+                  <Input
+                    id="start-time"
+                    type="time"
+                    value={nuevoHorario.hora_entrada}
+                    onChange={(e) => setNuevoHorario({ ...nuevoHorario, hora_entrada: e.target.value })}
                   />
                 </div>
                 <div>
                   <Label htmlFor="end-time">Hora de Fin</Label>
-                  <Input 
-                    id="end-time" 
-                    type="time" 
-                    value={nuevoHorario.fecha_fin}
-                    onChange={(e) => setNuevoHorario({...nuevoHorario, fecha_fin: e.target.value})}
+                  <Input
+                    id="end-time"
+                    type="time"
+                    value={nuevoHorario.hora_salida}
+                    onChange={(e) => setNuevoHorario({ ...nuevoHorario, hora_salida: e.target.value })}
                   />
                 </div>
               </div>
 
               <div className="flex items-center space-x-2">
-                <Switch 
-                  id="active" 
+                <Switch
+                  id="active"
                   checked={nuevoHorario.estado === 1}
-                  onCheckedChange={(checked) => setNuevoHorario({...nuevoHorario, estado: checked ? 1 : 0})}
+                  onCheckedChange={(checked) => setNuevoHorario({ ...nuevoHorario, estado: checked ? 1 : 0 })}
                 />
                 <Label htmlFor="active">Horario activo</Label>
               </div>
@@ -298,7 +299,7 @@ export const HorariosPage: React.FC = () => {
                       <Clock className="w-4 h-4 text-gray-500" />
                       <span className="text-sm text-gray-600">Horario:</span>
                     </div>
-                    <span className="font-medium">{horario.fecha_inicio} - {horario.fecha_fin}</span>
+                    <span className="font-medium">{horario.hora_entrada} - {horario.hora_salida}</span>
                   </div>
 
                   <div className="flex items-center justify-between">
@@ -322,7 +323,7 @@ export const HorariosPage: React.FC = () => {
                   <div className="pt-4 border-t">
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-gray-600">Estado del horario:</span>
-                      <Switch 
+                      <Switch
                         checked={horario.estado === 1}
                         onCheckedChange={() => handleToggleStatus(horario.id_horario, horario.estado)}
                       />
@@ -348,18 +349,18 @@ export const HorariosPage: React.FC = () => {
             <div className="space-y-4">
               <div>
                 <Label htmlFor="edit-schedule-name">Nombre del Horario</Label>
-                <Input 
-                  id="edit-schedule-name" 
+                <Input
+                  id="edit-schedule-name"
                   value={nuevoHorario.nombre_horario}
-                  onChange={(e) => setNuevoHorario({...nuevoHorario, nombre_horario: e.target.value})}
+                  onChange={(e) => setNuevoHorario({ ...nuevoHorario, nombre_horario: e.target.value })}
                 />
               </div>
 
               <div>
                 <Label htmlFor="edit-area">Área de Trabajo</Label>
-                <Select 
-                  value={nuevoHorario.id_area_trabajo.toString()} 
-                  onValueChange={(value: string) => setNuevoHorario({...nuevoHorario, id_area_trabajo: parseInt(value)})}
+                <Select
+                  value={nuevoHorario.id_area_trabajo.toString()}
+                  onValueChange={(value: string) => setNuevoHorario({ ...nuevoHorario, id_area_trabajo: parseInt(value) })}
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -376,29 +377,29 @@ export const HorariosPage: React.FC = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="edit-start-time">Hora de Inicio</Label>
-                  <Input 
-                    id="edit-start-time" 
-                    type="time" 
-                    value={nuevoHorario.fecha_inicio}
-                    onChange={(e) => setNuevoHorario({...nuevoHorario, fecha_inicio: e.target.value})}
+                  <Input
+                    id="edit-start-time"
+                    type="time"
+                    value={nuevoHorario.hora_entrada}
+                    onChange={(e) => setNuevoHorario({ ...nuevoHorario, hora_entrada: e.target.value })}
                   />
                 </div>
                 <div>
                   <Label htmlFor="edit-end-time">Hora de Fin</Label>
-                  <Input 
-                    id="edit-end-time" 
-                    type="time" 
-                    value={nuevoHorario.fecha_fin}
-                    onChange={(e) => setNuevoHorario({...nuevoHorario, fecha_fin: e.target.value})}
+                  <Input
+                    id="edit-end-time"
+                    type="time"
+                    value={nuevoHorario.hora_salida}
+                    onChange={(e) => setNuevoHorario({ ...nuevoHorario, hora_salida: e.target.value })}
                   />
                 </div>
               </div>
 
               <div className="flex items-center space-x-2">
-                <Switch 
-                  id="edit-active" 
+                <Switch
+                  id="edit-active"
                   checked={nuevoHorario.estado === 1}
-                  onCheckedChange={(checked) => setNuevoHorario({...nuevoHorario, estado: checked ? 1 : 0})}
+                  onCheckedChange={(checked) => setNuevoHorario({ ...nuevoHorario, estado: checked ? 1 : 0 })}
                 />
                 <Label htmlFor="edit-active">Horario activo</Label>
               </div>
