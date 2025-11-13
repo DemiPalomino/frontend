@@ -5,6 +5,7 @@ import { Label } from '../../../components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../components/ui/select';
 import { Empleado, CreateEmpleadoDTO } from '../services/empleado.service';
 
+
 interface EmpleadoModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -45,7 +46,7 @@ export const EmpleadoModal: React.FC<EmpleadoModalProps> = ({
         apellidos: empleado.apellidos,
         email: empleado.email,
         telefono: empleado.telefono,
-        fecha_nacimiento: empleado.fecha_nacimiento.split('T')[0], // Formato YYYY-MM-DD
+        fecha_nacimiento: empleado.fecha_nacimiento.split('T')[0],
         id_area_trabajo: empleado.id_area_trabajo
       });
     } else {
@@ -151,7 +152,7 @@ export const EmpleadoModal: React.FC<EmpleadoModalProps> = ({
               <Label htmlFor="area">Área de Trabajo</Label>
               <Select
                 value={formData.id_area_trabajo.toString()}
-                onValueChange={(value) => setFormData(prev => ({ ...prev, id_area_trabajo: parseInt(value) }))}
+                onValueChange={(value: string) => setFormData(prev => ({ ...prev, id_area_trabajo: parseInt(value) }))}
               >
                 <SelectTrigger>
                   <SelectValue />

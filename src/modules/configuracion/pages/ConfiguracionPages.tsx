@@ -7,9 +7,9 @@ import { Label } from '../../../components/ui/label';
 import { Switch } from '../../../components/ui/switch';
 import { Textarea } from '../../../components/ui/textarea';
 import { Separator } from '../../../components/ui/separator';
-import { 
-  Settings, 
-  Building, 
+import {
+  Settings,
+  Building,
   Camera,
   Bell,
   Shield,
@@ -19,14 +19,14 @@ import {
 } from 'lucide-react';
 
 export const ConfiguracionPages: React.FC = () => {
-  const { 
-    empresa, 
-    asistencia, 
-    facial, 
-    notificaciones, 
+  const {
+    empresa,
+    asistencia,
+    facial,
+    notificaciones,
     estadoSistema,
-    loading, 
-    saving, 
+    loading,
+    saving,
     error,
     actualizarConfiguracionEmpresa,
     actualizarConfiguracionAsistencia,
@@ -63,39 +63,48 @@ export const ConfiguracionPages: React.FC = () => {
     tiempo_sesion: 60
   });
 
-  // Cargar los datos en los formularios cuando se cargue la configuración
+
   useEffect(() => {
     if (empresa) {
       setEmpresaForm({
-        nombre_empresa: empresa.nombre_empresa,
-        ruc: empresa.ruc,
-        direccion: empresa.direccion
+        nombre_empresa: empresa.nombre_empresa || '',
+        ruc: empresa.ruc || '',
+        direccion: empresa.direccion || ''
       });
     }
+  }, [empresa]);
+
+  useEffect(() => {
     if (asistencia) {
       setAsistenciaForm({
-        tiempo_gracia: asistencia.tiempo_gracia,
-        duracion_descanso: asistencia.duracion_descanso,
-        umbral_horas_extra: asistencia.umbral_horas_extra,
-        registro_automatico_salida: asistencia.registro_automatico_salida
+        tiempo_gracia: asistencia.tiempo_gracia || 15,
+        duracion_descanso: asistencia.duracion_descanso || 60,
+        umbral_horas_extra: asistencia.umbral_horas_extra || 8,
+        registro_automatico_salida: asistencia.registro_automatico_salida !== undefined ? asistencia.registro_automatico_salida : true
       });
     }
+  }, [asistencia]);
+
+  useEffect(() => {
     if (facial) {
       setFacialForm({
-        habilitar_reconocimiento_facial: facial.habilitar_reconocimiento_facial,
-        nivel_confianza: facial.nivel_confianza,
-        intentos_reconocimiento: facial.intentos_reconocimiento
+        habilitar_reconocimiento_facial: facial.habilitar_reconocimiento_facial !== undefined ? facial.habilitar_reconocimiento_facial : true,
+        nivel_confianza: facial.nivel_confianza || 85,
+        intentos_reconocimiento: facial.intentos_reconocimiento || 3
       });
     }
+  }, [facial]);
+
+  useEffect(() => {
     if (notificaciones) {
       setNotificacionesForm({
-        notificaciones_email: notificaciones.notificaciones_email,
-        respaldo_automatico: notificaciones.respaldo_automatico,
-        hora_respaldo: notificaciones.hora_respaldo,
-        tiempo_sesion: notificaciones.tiempo_sesion
+        notificaciones_email: notificaciones.notificaciones_email !== undefined ? notificaciones.notificaciones_email : true,
+        respaldo_automatico: notificaciones.respaldo_automatico !== undefined ? notificaciones.respaldo_automatico : true,
+        hora_respaldo: notificaciones.hora_respaldo || '02:00',
+        tiempo_sesion: notificaciones.tiempo_sesion || 60
       });
     }
-  }, [empresa, asistencia, facial, notificaciones]);
+  }, [notificaciones]);
 
   const handleSaveEmpresa = async () => {
     try {
@@ -220,28 +229,28 @@ export const ConfiguracionPages: React.FC = () => {
           <CardContent className="space-y-4">
             <div>
               <Label htmlFor="company-name">Nombre de la Empresa</Label>
-              <Input 
+              <Input
                 id="company-name"
                 value={empresaForm.nombre_empresa}
-                onChange={(e) => setEmpresaForm({...empresaForm, nombre_empresa: e.target.value})}
+                onChange={(e) => setEmpresaForm({ ...empresaForm, nombre_empresa: e.target.value })}
               />
             </div>
-            
+
             <div>
               <Label htmlFor="company-ruc">RUC</Label>
-              <Input 
+              <Input
                 id="company-ruc"
                 value={empresaForm.ruc}
-                onChange={(e) => setEmpresaForm({...empresaForm, ruc: e.target.value})}
+                onChange={(e) => setEmpresaForm({ ...empresaForm, ruc: e.target.value })}
               />
             </div>
-            
+
             <div>
               <Label htmlFor="company-address">Dirección</Label>
-              <Textarea 
+              <Textarea
                 id="company-address"
                 value={empresaForm.direccion}
-                onChange={(e) => setEmpresaForm({...empresaForm, direccion: e.target.value})}
+                onChange={(e) => setEmpresaForm({ ...empresaForm, direccion: e.target.value })}
                 rows={3}
               />
             </div>
@@ -267,9 +276,9 @@ export const ConfiguracionPages: React.FC = () => {
                 <Label>Habilitar Reconocimiento Facial</Label>
                 <p className="text-sm text-gray-600">Permite el registro automático de asistencia</p>
               </div>
-              <Switch 
+              <Switch
                 checked={facialForm.habilitar_reconocimiento_facial}
-                onCheckedChange={(checked) => setFacialForm({...facialForm, habilitar_reconocimiento_facial: checked})}
+                onCheckedChange={(checked) => setFacialForm({ ...facialForm, habilitar_reconocimiento_facial: checked })}
               />
             </div>
 
@@ -277,11 +286,14 @@ export const ConfiguracionPages: React.FC = () => {
 
             <div>
               <Label htmlFor="confidence">Nivel de Confianza (%)</Label>
-              <Input 
+              <Input
                 id="confidence"
                 type="number"
-                value={facialForm.nivel_confianza}
-                onChange={(e) => setFacialForm({...facialForm, nivel_confianza: parseInt(e.target.value)})}
+                value={facialForm.nivel_confianza || ''}
+                onChange={(e) => setFacialForm({
+                  ...facialForm,
+                  nivel_confianza: parseInt(e.target.value) || 0
+                })}
                 min="50"
                 max="100"
               />
@@ -292,11 +304,14 @@ export const ConfiguracionPages: React.FC = () => {
 
             <div>
               <Label htmlFor="retry-attempts">Intentos de Reconocimiento</Label>
-              <Input 
+              <Input
                 id="retry-attempts"
                 type="number"
-                value={facialForm.intentos_reconocimiento}
-                onChange={(e) => setFacialForm({...facialForm, intentos_reconocimiento: parseInt(e.target.value)})}
+                value={facialForm.intentos_reconocimiento || ''}
+                onChange={(e) => setFacialForm({
+                  ...facialForm,
+                  intentos_reconocimiento: parseInt(e.target.value) || 0
+                })}
                 min="1"
                 max="10"
               />
@@ -325,11 +340,14 @@ export const ConfiguracionPages: React.FC = () => {
           <CardContent className="space-y-4">
             <div>
               <Label htmlFor="tardanza-limit">Tiempo de Gracia (minutos)</Label>
-              <Input 
+              <Input
                 id="tardanza-limit"
                 type="number"
-                value={asistenciaForm.tiempo_gracia}
-                onChange={(e) => setAsistenciaForm({...asistenciaForm, tiempo_gracia: parseInt(e.target.value)})}
+                value={asistenciaForm.tiempo_gracia || ''}
+                onChange={(e) => setAsistenciaForm({
+                  ...asistenciaForm,
+                  tiempo_gracia: parseInt(e.target.value) || 0
+                })}
                 min="0"
                 max="60"
               />
@@ -340,11 +358,11 @@ export const ConfiguracionPages: React.FC = () => {
 
             <div>
               <Label htmlFor="break-duration">Duración de Descanso (minutos)</Label>
-              <Input 
+              <Input
                 id="break-duration"
                 type="number"
                 value={asistenciaForm.duracion_descanso}
-                onChange={(e) => setAsistenciaForm({...asistenciaForm, duracion_descanso: parseInt(e.target.value)})}
+                onChange={(e) => setAsistenciaForm({ ...asistenciaForm, duracion_descanso: parseInt(e.target.value) })}
                 min="30"
                 max="120"
               />
@@ -352,11 +370,11 @@ export const ConfiguracionPages: React.FC = () => {
 
             <div>
               <Label htmlFor="overtime-threshold">Umbral de Horas Extra (horas)</Label>
-              <Input 
+              <Input
                 id="overtime-threshold"
                 type="number"
                 value={asistenciaForm.umbral_horas_extra}
-                onChange={(e) => setAsistenciaForm({...asistenciaForm, umbral_horas_extra: parseInt(e.target.value)})}
+                onChange={(e) => setAsistenciaForm({ ...asistenciaForm, umbral_horas_extra: parseInt(e.target.value) })}
                 min="6"
                 max="12"
                 step="0.5"
@@ -368,9 +386,9 @@ export const ConfiguracionPages: React.FC = () => {
                 <Label>Registro Automático de Salida</Label>
                 <p className="text-sm text-gray-600">Registrar salida automáticamente al final de la jornada</p>
               </div>
-              <Switch 
+              <Switch
                 checked={asistenciaForm.registro_automatico_salida}
-                onCheckedChange={(checked) => setAsistenciaForm({...asistenciaForm, registro_automatico_salida: checked})}
+                onCheckedChange={(checked) => setAsistenciaForm({ ...asistenciaForm, registro_automatico_salida: checked })}
               />
             </div>
 
@@ -395,9 +413,9 @@ export const ConfiguracionPages: React.FC = () => {
                 <Label>Notificaciones por Email</Label>
                 <p className="text-sm text-gray-600">Enviar resúmenes diarios por email</p>
               </div>
-              <Switch 
+              <Switch
                 checked={notificacionesForm.notificaciones_email}
-                onCheckedChange={(checked) => setNotificacionesForm({...notificacionesForm, notificaciones_email: checked})}
+                onCheckedChange={(checked) => setNotificacionesForm({ ...notificacionesForm, notificaciones_email: checked })}
               />
             </div>
 
@@ -408,29 +426,29 @@ export const ConfiguracionPages: React.FC = () => {
                 <Label>Respaldo Automático</Label>
                 <p className="text-sm text-gray-600">Respaldar datos diariamente</p>
               </div>
-              <Switch 
+              <Switch
                 checked={notificacionesForm.respaldo_automatico}
-                onCheckedChange={(checked) => setNotificacionesForm({...notificacionesForm, respaldo_automatico: checked})}
+                onCheckedChange={(checked) => setNotificacionesForm({ ...notificacionesForm, respaldo_automatico: checked })}
               />
             </div>
 
             <div>
               <Label htmlFor="backup-time">Hora de Respaldo</Label>
-              <Input 
+              <Input
                 id="backup-time"
                 type="time"
                 value={notificacionesForm.hora_respaldo}
-                onChange={(e) => setNotificacionesForm({...notificacionesForm, hora_respaldo: e.target.value})}
+                onChange={(e) => setNotificacionesForm({ ...notificacionesForm, hora_respaldo: e.target.value })}
               />
             </div>
 
             <div>
               <Label htmlFor="session-timeout">Tiempo de Sesión (minutos)</Label>
-              <Input 
+              <Input
                 id="session-timeout"
                 type="number"
                 value={notificacionesForm.tiempo_sesion}
-                onChange={(e) => setNotificacionesForm({...notificacionesForm, tiempo_sesion: parseInt(e.target.value)})}
+                onChange={(e) => setNotificacionesForm({ ...notificacionesForm, tiempo_sesion: parseInt(e.target.value) })}
                 min="15"
                 max="480"
               />
@@ -462,7 +480,7 @@ export const ConfiguracionPages: React.FC = () => {
                 <p className="text-sm text-gray-600">Base de Datos</p>
                 <p className="font-semibold text-green-600">{estadoSistema.base_datos}</p>
               </div>
-              
+
               <div className="text-center p-4 bg-green-50 rounded-lg">
                 <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
                   <Camera className="w-6 h-6 text-green-600" />
@@ -470,7 +488,7 @@ export const ConfiguracionPages: React.FC = () => {
                 <p className="text-sm text-gray-600">Cámara</p>
                 <p className="font-semibold text-green-600">{estadoSistema.camara}</p>
               </div>
-              
+
               <div className="text-center p-4 bg-blue-50 rounded-lg">
                 <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
                   <RefreshCw className="w-6 h-6 text-blue-600" />
@@ -493,7 +511,7 @@ export const ConfiguracionPages: React.FC = () => {
           <RefreshCw className="w-4 h-4 mr-2" />
           Restablecer Configuración
         </Button>
-        
+
         <div className="space-x-2">
           <Button variant="outline">
             Cancelar

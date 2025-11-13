@@ -34,30 +34,32 @@ export interface EstadoSistema {
 }
 
 export const configuracionService = {
-  // Configuración de la Empresa
-  getConfiguracionEmpresa: async (): Promise<ConfiguracionEmpresa> => {
-    try {
-      const companys = await apiFetch("/companys");
-      return companys[0] || {
-        id_empresa: 1,
-        nombre_empresa: "Empresa Demo",
-        ruc: "20123456789",
-        direccion: "Av. Principal 123, Lima"
-      };
-    } catch (error) {
-      console.error('Error fetching empresa config:', error);
-      return {
-        id_empresa: 1,
-        nombre_empresa: "Empresa Demo",
-        ruc: "20123456789",
-        direccion: "Av. Principal 123, Lima"
-      };
-    }
-  },
+
+getConfiguracionEmpresa: async (): Promise<ConfiguracionEmpresa> => {
+  try {
+    const companies = await apiFetch("/companies");
+    const companyData = companies[0];
+    
+    return {
+      id_empresa: companyData?.id_empresa || 1,
+      nombre_empresa: companyData?.nombre_empresa || "Empresa Demo",
+      ruc: companyData?.ruc || "20123456789",
+      direccion: companyData?.direccion || "Av. Principal 123, Lima"
+    };
+  } catch (error) {
+    console.error('Error fetching empresa config:', error);
+    return {
+      id_empresa: 1,
+      nombre_empresa: "Empresa Demo",
+      ruc: "20123456789",
+      direccion: "Av. Principal 123, Lima"
+    };
+  }
+},
 
   updateConfiguracionEmpresa: async (configuracion: Partial<ConfiguracionEmpresa>): Promise<ConfiguracionEmpresa> => {
     try {
-      return await apiFetch("/company/1", {
+      return await apiFetch("/companies/1", {
         method: "PUT",
         body: JSON.stringify(configuracion),
       });
@@ -199,7 +201,7 @@ export const configuracionService = {
   // Probar Cámara
   probarCamara: async (): Promise<boolean> => {
     try {
-      // Simular prueba de cámara
+      
       await new Promise(resolve => setTimeout(resolve, 1000));
       return true;
     } catch (error) {

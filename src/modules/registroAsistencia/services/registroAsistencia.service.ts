@@ -40,14 +40,46 @@ export const registroAsistenciaService = {
     }
   },
 
-  obtenerDescriptoresEmpleados: async (): Promise<{id_persona: number, descriptor: number[]}[]> => {
+  obtenerDescriptoresEmpleados: async (): Promise<DescriptorEmpleado[]> => {
+    try {
+      console.log('📥 Obteniendo descriptores de empleados...');
+      // Por ahora, retornar datos de prueba
+      return [
+        {
+          id_persona: 1,
+          descriptor: Array.from({length: 128}, () => Math.random()),
+          nombres: "Admin",
+          apellidos: "Sistema", 
+          dni: "12345678"
+        },
+        {
+          id_persona: 2,
+          descriptor: Array.from({length: 128}, () => Math.random()),
+          nombres: "Juan Carlos",
+          apellidos: "Pérez López",
+          dni: "87654321"
+        },
+        {
+          id_persona: 3,
+          descriptor: Array.from({length: 128}, () => Math.random()),
+          nombres: "María Elena", 
+          apellidos: "García Torres",
+          dni: "11223344"
+        }
+      ];
+    } catch (error) {
+      console.error('❌ Error obteniendo descriptores:', error);
+      throw new Error('No se pudieron cargar los descriptores de empleados');
+    }
+  },
+ /*  obtenerDescriptoresEmpleados: async (): Promise<{id_persona: number, descriptor: number[]}[]> => {
     try {
       return await apiFetch("/personas/descriptores");
     } catch (error) {
       console.error('Error obteniendo descriptores:', error);
       return [];
     }
-  },
+  }, */
 
   registrarDescriptorFacial: async (id_persona: number, descriptor: number[]): Promise<any> => {
     try {

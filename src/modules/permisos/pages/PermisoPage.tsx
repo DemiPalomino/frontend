@@ -9,9 +9,9 @@ import { Label } from '../../../components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../components/ui/select';
 import { Calendar } from '../../../components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '../../../components/ui/popover';
-import { 
-  FileText, 
-  Plus, 
+import {
+  FileText,
+  Plus,
   Calendar as CalendarIcon,
   Clock,
   CheckCircle,
@@ -21,13 +21,13 @@ import {
 } from 'lucide-react';
 
 export const PermisoPage: React.FC = () => {
-  const { 
-    permisos, 
-    loading, 
+  const {
+    permisos,
+    loading,
     error,
     crearPermiso,
     aprobarPermiso,
-    rechazarPermiso 
+    rechazarPermiso
   } = usePermiso();
 
   const [showRequestDialog, setShowRequestDialog] = useState(false);
@@ -71,10 +71,17 @@ export const PermisoPage: React.FC = () => {
         return;
       }
 
+      // ✅ CORREGIDO: Asegurar que las fechas tengan hora
+      const fechaInicio = new Date(selectedStartDate);
+      fechaInicio.setHours(8, 0, 0, 0); // Establecer hora de inicio (ej: 8:00 AM)
+
+      const fechaFin = new Date(selectedEndDate);
+      fechaFin.setHours(17, 0, 0, 0); // Establecer hora de fin (ej: 5:00 PM)
+
       await crearPermiso({
-        fecha_solicitud: new Date().toISOString(),
-        fecha_inicio_ausencia: selectedStartDate.toISOString(),
-        fecha_fin_ausencia: selectedEndDate.toISOString(),
+        fecha_solicitud: new Date().toISOString(), // Fecha actual
+        fecha_inicio_ausencia: fechaInicio.toISOString(),
+        fecha_fin_ausencia: fechaFin.toISOString(),
         tipo_permiso: requestType,
         justificacion: justification,
         estado: 'pendiente',
@@ -86,8 +93,10 @@ export const PermisoPage: React.FC = () => {
       setSelectedStartDate(undefined);
       setSelectedEndDate(undefined);
       setJustification('');
-    } catch (error) {
-      alert('Error al enviar la solicitud');
+      setRequestType('personal');
+    } catch (error: any) {
+      console.error('Error al enviar solicitud:', error);
+      alert('Error al enviar la solicitud: ' + error.message);
     }
   };
 
@@ -309,7 +318,7 @@ export const PermisoPage: React.FC = () => {
             ) : (
               permisos.map((permiso) => {
                 const StatusIcon = getStatusIcon(permiso.estado);
-                
+
                 return (
                   <div key={permiso.id_permiso} className="border rounded-lg p-4">
                     <div className="flex items-start justify-between">
@@ -331,7 +340,7 @@ export const PermisoPage: React.FC = () => {
                           </div>
                         </div>
                       </div>
-                      
+
                       <div className="text-right">
                         <p className="text-sm text-gray-600">Solicitud: {new Date(permiso.fecha_solicitud).toLocaleDateString('es-ES')}</p>
                         <p className="text-sm">
@@ -342,16 +351,16 @@ export const PermisoPage: React.FC = () => {
                         </p>
                       </div>
                     </div>
-                    
+
                     <div className="mt-4">
                       <p className="text-sm text-gray-600 mb-2"><strong>Justificación:</strong></p>
                       <p className="text-sm bg-gray-50 p-3 rounded border">{permiso.justificacion}</p>
                     </div>
-                    
+
                     {permiso.estado === 'pendiente' && (
                       <div className="flex justify-end space-x-2 mt-4 pt-4 border-t">
-                        <Button 
-                          size="sm" 
+                        <Button
+                          size="sm"
                           variant="outline"
                           onClick={() => handleRejectRequest(permiso.id_permiso)}
                           className="text-red-600 hover:text-red-700"
@@ -359,7 +368,7 @@ export const PermisoPage: React.FC = () => {
                           <XCircle className="w-4 h-4 mr-1" />
                           Rechazar
                         </Button>
-                        <Button 
+                        <Button
                           size="sm"
                           onClick={() => handleApproveRequest(permiso.id_permiso)}
                           className="text-green-600 hover:text-green-700"
