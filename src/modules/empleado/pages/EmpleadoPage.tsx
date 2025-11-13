@@ -36,10 +36,9 @@ export const EmpleadoPage: React.FC = () => {
   const getAreaName = (areaId: number) => {
     const areas: { [key: number]: string } = {
       1: 'Administración',
-      2: 'Recursos Humanos',
-      3: 'Contabilidad',
-      4: 'Sistemas',
-      5: 'Ventas'
+      2: 'Diseño',
+      3: 'Ploteo',
+      4: 'Ventas'
     };
     return areas[areaId] || 'Sin área';
   };

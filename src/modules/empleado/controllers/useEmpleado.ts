@@ -22,11 +22,9 @@ export const useEmpleado = () => {
 
   const crearEmpleado = async (empleadoData: CreateEmpleadoDTO) => {
     try {
-      setError(null);
-      // ✅ Asegurar que los campos tengan el nombre correcto
+      setError(null);      
       const empleadoParaBackend = {
-        ...empleadoData,
-        // No necesita mapeo si ya usamos los nombres correctos en CreateEmpleadoDTO
+        ...empleadoData,        
       };
       const nuevoEmpleado = await empleadoService.create(empleadoParaBackend);
       setEmpleados(prev => [...prev, nuevoEmpleado]);

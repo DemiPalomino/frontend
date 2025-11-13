@@ -20,22 +20,7 @@ export const useRegistroAsistencia = () => {
       setLoading(false);
     }
   };
-
-  const registrarAsistenciaManual = async (id_persona: number) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const resultado = await registroAsistenciaService.registrarAsistenciaManual(id_persona);
-      setUltimoRegistro(resultado);
-      return resultado;
-    } catch (err: any) {
-      setError(err.message || 'Error al registrar asistencia manual');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  
   const verificarRostro = async (descriptor: number[]) => {
     try {
       setLoading(true);
@@ -73,8 +58,7 @@ export const useRegistroAsistencia = () => {
     loading,
     error,
     ultimoRegistro,
-    registrarAsistenciaFacial,
-    registrarAsistenciaManual,
+    registrarAsistenciaFacial,  
     verificarRostro,
     registrarRostro,
     limpiarEstado,

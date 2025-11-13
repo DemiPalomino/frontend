@@ -7,7 +7,7 @@ export const useSucursal = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Cargar datos iniciales
+ 
   const cargarDatos = async () => {
     try {
       setLoading(true);
@@ -24,7 +24,7 @@ export const useSucursal = () => {
     }
   };
 
-  // Operaciones de Sucursales
+ 
   const crearSucursal = async (sucursal: Omit<Sucursal, 'id_sucursal'>) => {
     try {
       const nuevaSucursal = await sucursalService.createSucursal(sucursal);
@@ -69,10 +69,10 @@ export const useSucursal = () => {
     }
   };
 
- // En useSucursal.ts - Mejorar la función de actualización
+
 const actualizarArea = async (id: number, area: Partial<AreaTrabajo>) => {
   try {
-    // ✅ Asegurar que los datos estén completos
+   
     const datosCompletos = {
       nombre_area: area.nombre_area || '',
       descripcion: area.descripcion || '',
@@ -98,7 +98,7 @@ const actualizarArea = async (id: number, area: Partial<AreaTrabajo>) => {
     }
   };
 
-  // Helper functions
+
   const getAreasPorSucursal = (idSucursal: number) => {
     return areas.filter(area => area.id_sucursal === idSucursal);
   };

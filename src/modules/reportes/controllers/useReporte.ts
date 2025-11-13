@@ -25,7 +25,7 @@ export const useReporte = () => {
       setLoading(true);
       const blob = await reporteService.exportarPDF(filtros);
       
-      // Crear enlace de descarga
+  
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.style.display = 'none';

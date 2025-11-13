@@ -28,7 +28,7 @@ export const dashboardService = {
       return await apiFetch("/estadisticas");
     } catch (error) {
       console.error('Error fetching estadísticas:', error);
-      // Retornar datos por defecto en caso de error
+      
       return {
         totalEmpleados: 0,
         asistenciasHoy: 0,

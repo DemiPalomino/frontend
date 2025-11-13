@@ -4,7 +4,7 @@ export async function apiFetch(
     endpoint: string,
     options: RequestInit = {}
 ): Promise<any> {
-    /* extraemos el token del localstore */
+    
     const token = localStorage.getItem("Token");
     const headers: HeadersInit = {
         "Content-Type": "application/json",

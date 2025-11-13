@@ -15,10 +15,9 @@ interface EmpleadoModalProps {
 
 const areas = [
   { id: 1, nombre: 'Administración' },
-  { id: 2, nombre: 'Recursos Humanos' },
-  { id: 3, nombre: 'Contabilidad' },
-  { id: 4, nombre: 'Sistemas' },
-  { id: 5, nombre: 'Ventas' }
+  { id: 2, nombre: 'Diseño' },
+  { id: 3, nombre: 'Ploteo' },
+  { id: 4, nombre: 'Ventas' }
 ];
 
 export const EmpleadoModal: React.FC<EmpleadoModalProps> = ({

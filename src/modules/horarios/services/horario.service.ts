@@ -3,8 +3,8 @@ import { apiFetch } from "../../../app/service/api";
 export interface Horario {
   id_horario: number;
   nombre_horario: string;
-  hora_entrada: string;  // ✅ CAMBIADO: de fecha_inicio a hora_entrada
-  hora_salida: string;   // ✅ CAMBIADO: de fecha_fin a hora_salida
+  hora_entrada: string; 
+  hora_salida: string;  
   id_area_trabajo: number;
   estado: number;
   nombre_area?: string;
@@ -12,8 +12,8 @@ export interface Horario {
 
 export interface CreateHorarioDTO {
   nombre_horario: string;
-  hora_entrada: string;  // ✅ CAMBIADO
-  hora_salida: string;   // ✅ CAMBIADO
+  hora_entrada: string;  
+  hora_salida: string;   
   id_area_trabajo: number;
   estado?: number;
 }

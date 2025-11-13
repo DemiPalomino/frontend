@@ -6,14 +6,10 @@ import { Input } from '../../../components/ui/input';
 import { Label } from '../../../components/ui/label';
 import { Switch } from '../../../components/ui/switch';
 import { Textarea } from '../../../components/ui/textarea';
-import { Separator } from '../../../components/ui/separator';
+
 import {
   Settings,
-  Building,
-  Camera,
-  Bell,
-  Shield,
-  Database,
+  Building,  
   Save,
   RefreshCw
 } from 'lucide-react';
@@ -21,19 +17,12 @@ import {
 export const ConfiguracionPages: React.FC = () => {
   const {
     empresa,
-    asistencia,
-    facial,
-    notificaciones,
-    estadoSistema,
+    asistencia,    
     loading,
     saving,
     error,
     actualizarConfiguracionEmpresa,
-    actualizarConfiguracionAsistencia,
-    actualizarConfiguracionFacial,
-    actualizarConfiguracionNotificaciones,
-    realizarBackup,
-    probarCamara,
+    actualizarConfiguracionAsistencia,       
     guardarTodasLasConfiguraciones
   } = useConfiguracion();
 
@@ -49,20 +38,6 @@ export const ConfiguracionPages: React.FC = () => {
     umbral_horas_extra: 8,
     registro_automatico_salida: true
   });
-
-  const [facialForm, setFacialForm] = useState({
-    habilitar_reconocimiento_facial: true,
-    nivel_confianza: 85,
-    intentos_reconocimiento: 3
-  });
-
-  const [notificacionesForm, setNotificacionesForm] = useState({
-    notificaciones_email: true,
-    respaldo_automatico: true,
-    hora_respaldo: '02:00',
-    tiempo_sesion: 60
-  });
-
 
   useEffect(() => {
     if (empresa) {
@@ -84,28 +59,7 @@ export const ConfiguracionPages: React.FC = () => {
       });
     }
   }, [asistencia]);
-
-  useEffect(() => {
-    if (facial) {
-      setFacialForm({
-        habilitar_reconocimiento_facial: facial.habilitar_reconocimiento_facial !== undefined ? facial.habilitar_reconocimiento_facial : true,
-        nivel_confianza: facial.nivel_confianza || 85,
-        intentos_reconocimiento: facial.intentos_reconocimiento || 3
-      });
-    }
-  }, [facial]);
-
-  useEffect(() => {
-    if (notificaciones) {
-      setNotificacionesForm({
-        notificaciones_email: notificaciones.notificaciones_email !== undefined ? notificaciones.notificaciones_email : true,
-        respaldo_automatico: notificaciones.respaldo_automatico !== undefined ? notificaciones.respaldo_automatico : true,
-        hora_respaldo: notificaciones.hora_respaldo || '02:00',
-        tiempo_sesion: notificaciones.tiempo_sesion || 60
-      });
-    }
-  }, [notificaciones]);
-
+  
   const handleSaveEmpresa = async () => {
     try {
       await actualizarConfiguracionEmpresa(empresaForm);
@@ -123,54 +77,12 @@ export const ConfiguracionPages: React.FC = () => {
       alert('Error al guardar la configuración de asistencia');
     }
   };
-
-  const handleSaveFacial = async () => {
-    try {
-      await actualizarConfiguracionFacial(facialForm);
-      alert('Configuración de reconocimiento facial guardada exitosamente');
-    } catch (error) {
-      alert('Error al guardar la configuración de reconocimiento facial');
-    }
-  };
-
-  const handleSaveNotificaciones = async () => {
-    try {
-      await actualizarConfiguracionNotificaciones(notificacionesForm);
-      alert('Configuración de notificaciones guardada exitosamente');
-    } catch (error) {
-      alert('Error al guardar la configuración de notificaciones');
-    }
-  };
-
-  const handleBackupNow = async () => {
-    try {
-      await realizarBackup();
-      alert('Respaldo realizado exitosamente');
-    } catch (error) {
-      alert('Error al realizar el respaldo');
-    }
-  };
-
-  const handleTestCamera = async () => {
-    try {
-      const resultado = await probarCamara();
-      if (resultado) {
-        alert('Prueba de cámara exitosa - Sistema funcionando correctamente');
-      } else {
-        alert('Error en la prueba de cámara');
-      }
-    } catch (error) {
-      alert('Error al probar la cámara');
-    }
-  };
-
+  
   const handleSaveAll = async () => {
     try {
       await guardarTodasLasConfiguraciones(
         empresaForm,
-        asistenciaForm,
-        facialForm,
-        notificacionesForm
+        asistenciaForm
       );
       alert('Todas las configuraciones guardadas exitosamente');
     } catch (error) {
@@ -179,8 +91,7 @@ export const ConfiguracionPages: React.FC = () => {
   };
 
   const handleResetSettings = () => {
-    if (confirm('¿Estás seguro de que deseas restablecer toda la configuración?')) {
-      // Recargar la configuración desde el servidor
+    if (confirm('¿Estás seguro de que deseas restablecer toda la configuración?')) {      
       window.location.reload();
     }
   };
@@ -262,72 +173,7 @@ export const ConfiguracionPages: React.FC = () => {
           </CardContent>
         </Card>
 
-        {/* Face Recognition Settings */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Camera className="w-5 h-5" />
-              Reconocimiento Facial
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <Label>Habilitar Reconocimiento Facial</Label>
-                <p className="text-sm text-gray-600">Permite el registro automático de asistencia</p>
-              </div>
-              <Switch
-                checked={facialForm.habilitar_reconocimiento_facial}
-                onCheckedChange={(checked) => setFacialForm({ ...facialForm, habilitar_reconocimiento_facial: checked })}
-              />
-            </div>
-
-            <Separator />
-
-            <div>
-              <Label htmlFor="confidence">Nivel de Confianza (%)</Label>
-              <Input
-                id="confidence"
-                type="number"
-                value={facialForm.nivel_confianza || ''}
-                onChange={(e) => setFacialForm({
-                  ...facialForm,
-                  nivel_confianza: parseInt(e.target.value) || 0
-                })}
-                min="50"
-                max="100"
-              />
-              <p className="text-sm text-gray-600 mt-1">
-                Nivel mínimo de confianza para reconocimiento exitoso
-              </p>
-            </div>
-
-            <div>
-              <Label htmlFor="retry-attempts">Intentos de Reconocimiento</Label>
-              <Input
-                id="retry-attempts"
-                type="number"
-                value={facialForm.intentos_reconocimiento || ''}
-                onChange={(e) => setFacialForm({
-                  ...facialForm,
-                  intentos_reconocimiento: parseInt(e.target.value) || 0
-                })}
-                min="1"
-                max="10"
-              />
-            </div>
-
-            <Button onClick={handleTestCamera} disabled={saving} variant="outline" className="w-full">
-              <Camera className="w-4 h-4 mr-2" />
-              Probar Cámara
-            </Button>
-
-            <Button onClick={handleSaveFacial} disabled={saving} variant="outline" className="w-full">
-              <Save className="w-4 h-4 mr-2" />
-              {saving ? 'Guardando...' : 'Guardar Configuración Facial'}
-            </Button>
-          </CardContent>
-        </Card>
+        
 
         {/* Attendance Settings */}
         <Card>
@@ -399,112 +245,9 @@ export const ConfiguracionPages: React.FC = () => {
           </CardContent>
         </Card>
 
-        {/* Notifications & Security */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Bell className="w-5 h-5" />
-              Notificaciones y Seguridad
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <Label>Notificaciones por Email</Label>
-                <p className="text-sm text-gray-600">Enviar resúmenes diarios por email</p>
-              </div>
-              <Switch
-                checked={notificacionesForm.notificaciones_email}
-                onCheckedChange={(checked) => setNotificacionesForm({ ...notificacionesForm, notificaciones_email: checked })}
-              />
-            </div>
 
-            <Separator />
-
-            <div className="flex items-center justify-between">
-              <div>
-                <Label>Respaldo Automático</Label>
-                <p className="text-sm text-gray-600">Respaldar datos diariamente</p>
-              </div>
-              <Switch
-                checked={notificacionesForm.respaldo_automatico}
-                onCheckedChange={(checked) => setNotificacionesForm({ ...notificacionesForm, respaldo_automatico: checked })}
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="backup-time">Hora de Respaldo</Label>
-              <Input
-                id="backup-time"
-                type="time"
-                value={notificacionesForm.hora_respaldo}
-                onChange={(e) => setNotificacionesForm({ ...notificacionesForm, hora_respaldo: e.target.value })}
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="session-timeout">Tiempo de Sesión (minutos)</Label>
-              <Input
-                id="session-timeout"
-                type="number"
-                value={notificacionesForm.tiempo_sesion}
-                onChange={(e) => setNotificacionesForm({ ...notificacionesForm, tiempo_sesion: parseInt(e.target.value) })}
-                min="15"
-                max="480"
-              />
-            </div>
-
-            <Button onClick={handleBackupNow} disabled={saving} variant="outline" className="w-full">
-              <Database className="w-4 h-4 mr-2" />
-              {saving ? 'Respaldando...' : 'Respaldar Ahora'}
-            </Button>
-          </CardContent>
-        </Card>
       </div>
-
-      {/* System Status */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Shield className="w-5 h-5" />
-            Estado del Sistema
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {estadoSistema ? (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="text-center p-4 bg-green-50 rounded-lg">
-                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <Database className="w-6 h-6 text-green-600" />
-                </div>
-                <p className="text-sm text-gray-600">Base de Datos</p>
-                <p className="font-semibold text-green-600">{estadoSistema.base_datos}</p>
-              </div>
-
-              <div className="text-center p-4 bg-green-50 rounded-lg">
-                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <Camera className="w-6 h-6 text-green-600" />
-                </div>
-                <p className="text-sm text-gray-600">Cámara</p>
-                <p className="font-semibold text-green-600">{estadoSistema.camara}</p>
-              </div>
-
-              <div className="text-center p-4 bg-blue-50 rounded-lg">
-                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <RefreshCw className="w-6 h-6 text-blue-600" />
-                </div>
-                <p className="text-sm text-gray-600">Último Respaldo</p>
-                <p className="font-semibold text-blue-600">{estadoSistema.ultimo_respaldo}</p>
-              </div>
-            </div>
-          ) : (
-            <div className="text-center py-4 text-gray-500">
-              <p>No se pudo cargar el estado del sistema</p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
+      
       {/* Action Buttons */}
       <div className="flex justify-between">
         <Button variant="outline" onClick={handleResetSettings}>

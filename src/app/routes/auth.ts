@@ -6,8 +6,8 @@ export const isTokenValid = (): boolean => {
 
     try {
         const decoded: any = jwtDecode(token);
-        const now = Date.now() / 1000; // segundos
-        return decoded.exp > now;      // true si el token aún no expira
+        const now = Date.now() / 1000; 
+        return decoded.exp > now;      
     } catch {
         return false;
     }

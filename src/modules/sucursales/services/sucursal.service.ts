@@ -33,10 +33,10 @@ export interface CreateAreaDTO {
 }
 
 export const sucursalService = {
-  // ✅ CORREGIDO: Rutas actualizadas
+
   getSucursales: async (): Promise<Sucursal[]> => {
     try {
-      return await apiFetch("/sucursales");  // ✅ "sucursales" en plural
+      return await apiFetch("/sucursales");  
     } catch (error) {
       console.error('Error fetching sucursales:', error);
       throw new Error('No se pudieron cargar las sucursales');
@@ -45,7 +45,7 @@ export const sucursalService = {
 
   getSucursalById: async (id: number): Promise<Sucursal> => {
     try {
-      return await apiFetch(`/sucursales/${id}`);  // ✅ "sucursales" en plural
+      return await apiFetch(`/sucursales/${id}`); 
     } catch (error) {
       console.error(`Error fetching sucursal ${id}:`, error);
       throw new Error('No se pudo cargar la sucursal');
@@ -54,7 +54,7 @@ export const sucursalService = {
 
   createSucursal: async (sucursal: CreateSucursalDTO): Promise<Sucursal> => {
     try {
-      return await apiFetch("/sucursales", {  // ✅ "sucursales" en plural
+      return await apiFetch("/sucursales", { 
         method: "POST",
         body: JSON.stringify(sucursal),
       });
@@ -66,7 +66,7 @@ export const sucursalService = {
 
   updateSucursal: async (id: number, sucursal: Partial<Sucursal>): Promise<Sucursal> => {
     try {
-      return await apiFetch(`/sucursales/${id}`, {  // ✅ "sucursales" en plural
+      return await apiFetch(`/sucursales/${id}`, { 
         method: "PUT",
         body: JSON.stringify(sucursal),
       });
@@ -78,7 +78,7 @@ export const sucursalService = {
 
   deleteSucursal: async (id: number): Promise<void> => {
     try {
-      await apiFetch(`/sucursales/${id}`, {  // ✅ "sucursales" en plural
+      await apiFetch(`/sucursales/${id}`, { 
         method: "DELETE",
       });
     } catch (error) {
@@ -87,10 +87,10 @@ export const sucursalService = {
     }
   },
 
-  // ✅ CORREGIDO: Rutas para áreas
+
   getAreas: async (): Promise<AreaTrabajo[]> => {
     try {
-      return await apiFetch("/areas");  // ✅ Ruta correcta
+      return await apiFetch("/areas"); 
     } catch (error) {
       console.error('Error fetching areas:', error);
       throw new Error('No se pudieron cargar las áreas');
@@ -99,7 +99,7 @@ export const sucursalService = {
 
   getAreaById: async (id: number): Promise<AreaTrabajo> => {
     try {
-      return await apiFetch(`/areas/${id}`);  // ✅ Ruta correcta
+      return await apiFetch(`/areas/${id}`);  
     } catch (error) {
       console.error(`Error fetching area ${id}:`, error);
       throw new Error('No se pudo cargar el área');
@@ -108,7 +108,7 @@ export const sucursalService = {
 
   createArea: async (area: CreateAreaDTO): Promise<AreaTrabajo> => {
     try {
-      return await apiFetch("/areas", {  // ✅ Ruta correcta
+      return await apiFetch("/areas", { 
         method: "POST",
         body: JSON.stringify(area),
       });
@@ -120,7 +120,7 @@ export const sucursalService = {
 
   updateArea: async (id: number, area: Partial<AreaTrabajo>): Promise<AreaTrabajo> => {
     try {
-      return await apiFetch(`/areas/${id}`, {  // ✅ Ruta correcta
+      return await apiFetch(`/areas/${id}`, {  
         method: "PUT",
         body: JSON.stringify(area),
       });
@@ -132,7 +132,7 @@ export const sucursalService = {
 
   deleteArea: async (id: number): Promise<void> => {
     try {
-      await apiFetch(`/areas/${id}`, {  // ✅ Ruta correcta
+      await apiFetch(`/areas/${id}`, {  
         method: "DELETE",
       });
     } catch (error) {

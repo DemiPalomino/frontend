@@ -37,22 +37,22 @@ export const RegistroAsistenciaPage: React.FC = () => {
   const streamRef = useRef<MediaStream | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  // Cargar descriptores de empleados
+
   useEffect(() => {
 
-    // En registroAsistenciaPage.tsx - corregir la función cargarDescriptores
+    
     const cargarDescriptores = async () => {
       try {
         console.log('📥 Cargando descriptores de empleados...');
 
-        // CORRECCIÓN: Importar correctamente el servicio
+   
         const { registroAsistenciaService } = await import('../services/registroAsistencia.service');
         const descriptores = await registroAsistenciaService.obtenerDescriptoresEmpleados();
 
-        // CORRECCIÓN: Usar 'descriptor' en lugar de 'description'
+     
         const descriptoresFormateados = descriptores.map((emp: any) => ({
           id: emp.id_persona,
-          descriptor: new Float32Array(emp.descriptor) // ← Cambiar 'description' por 'descriptor'
+          descriptor: new Float32Array(emp.descriptor) 
         }));
 
         setDescriptoresEmpleados(descriptoresFormateados);
@@ -66,7 +66,7 @@ export const RegistroAsistenciaPage: React.FC = () => {
         console.log(`✅ Cargados ${descriptoresFormateados.length} descriptores de empleados`);
       } catch (error) {
         console.error('❌ Error cargando descriptores:', error);
-        // En desarrollo, usar datos de prueba
+     
         console.log('🔄 Usando datos de prueba para desarrollo...');
 
         const datosPrueba = [
@@ -104,14 +104,13 @@ export const RegistroAsistenciaPage: React.FC = () => {
     cargarDescriptores();
   }, []);
 
-  // En registroAsistenciaPage.tsx - REEMPLAZAR la función startCamera
+  
   const startCamera = async () => {
     try {
       if (!navigator.mediaDevices?.getUserMedia) {
         throw new Error('Tu navegador no soporta acceso a la cámara');
       }
 
-      // Asegurar que los modelos estén cargados
       if (!modelsLoaded) {
         console.log('🔄 Cargando modelos de IA...');
         const loaded = await loadModels();
@@ -122,7 +121,7 @@ export const RegistroAsistenciaPage: React.FC = () => {
 
       console.log('📷 Solicitando acceso a la cámara...');
 
-      // Detener cámara anterior si existe
+
       if (streamRef.current) {
         streamRef.current.getTracks().forEach(track => track.stop());
       }
@@ -139,7 +138,7 @@ export const RegistroAsistenciaPage: React.FC = () => {
         videoRef.current.srcObject = stream;
         streamRef.current = stream;
 
-        // Esperar a que el video esté listo
+
         await new Promise((resolve) => {
           if (videoRef.current) {
             videoRef.current.onloadedmetadata = () => {
@@ -212,7 +211,7 @@ export const RegistroAsistenciaPage: React.FC = () => {
     try {
       console.log('🔍 Iniciando proceso de reconocimiento facial...');
 
-      // Detectar rostros en el video
+
       const faces = await detectFaces(videoRef.current);
 
       if (faces.length === 0) {
@@ -230,7 +229,7 @@ export const RegistroAsistenciaPage: React.FC = () => {
       const face = faces[0];
       console.log('✅ Rostro detectado, procediendo a reconocimiento...');
 
-      // Reconocer el rostro
+
       const reconocimiento = await recognizeFace(face.descriptor, descriptoresEmpleados, 0.6);
 
       if (!reconocimiento) {
@@ -241,7 +240,7 @@ export const RegistroAsistenciaPage: React.FC = () => {
 
       console.log(`✅ Rostro reconocido: Empleado ID ${reconocimiento.id}`);
 
-      // Registrar asistencia
+     
       const resultado = await registrarAsistenciaFacial(reconocimiento.id);
       setScanResult('success');
 

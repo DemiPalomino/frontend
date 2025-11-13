@@ -36,7 +36,7 @@ export const permisoService = {
 
   getById: async (id: number): Promise<Permiso> => {
     try {
-      return await apiFetch(`/permisos/${id}`);  // ✅ CORREGIDO: "/permisos/:id"
+      return await apiFetch(`/permisos/${id}`);  
     } catch (error) {
       console.error(`Error fetching permiso ${id}:`, error);
       throw new Error('No se pudo cargar el permiso');
@@ -57,7 +57,7 @@ export const permisoService = {
 
   update: async (id: number, permiso: Partial<Permiso>): Promise<Permiso> => {
     try {
-      return await apiFetch(`/permisos/${id}`, {  // ✅ CORREGIDO: "/permisos/:id"
+      return await apiFetch(`/permisos/${id}`, { 
         method: "PUT",
         body: JSON.stringify(permiso),
       });
@@ -69,7 +69,7 @@ export const permisoService = {
 
   remove: async (id: number): Promise<void> => {
     try {
-      await apiFetch(`/permisos/${id}`, {  // ✅ CORREGIDO: "/permisos/:id"
+      await apiFetch(`/permisos/${id}`, {  
         method: "DELETE",
       });
     } catch (error) {

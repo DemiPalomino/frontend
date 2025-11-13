@@ -34,7 +34,7 @@ export const ReportesPage: React.FC = () => {
         id_persona: filtros.id_persona ? parseInt(filtros.id_persona) : undefined
       });
     } catch (error) {
-      // Error manejado en el controlador
+   
     }
   };
 
@@ -50,7 +50,7 @@ export const ReportesPage: React.FC = () => {
     }
   };
 
-  // Calcular estadísticas
+
   const totalRegistros = reporte.length;
   const totalTardanzas = reporte.filter(a => a.miniTardanza > 0).length;
   const totalFaltas = 0; // Esto debería calcularse basado en los empleados activos
@@ -105,9 +105,9 @@ export const ReportesPage: React.FC = () => {
                   <SelectValue placeholder="Todas las áreas" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="1">Desarrollo</SelectItem>
-                  <SelectItem value="2">Marketing</SelectItem>
-                  <SelectItem value="3">Recursos Humanos</SelectItem>
+                  <SelectItem value="1">Diseño</SelectItem>
+                  <SelectItem value="2">Ventas</SelectItem>
+                  <SelectItem value="3">Ploteo</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -241,7 +241,7 @@ export const ReportesPage: React.FC = () => {
                       </td>
                       <td className="py-4">
                         <Badge variant={asistencia.metodo_registro === 'reconocimientoFacial' ? 'default' : 'secondary'}>
-                          {asistencia.metodo_registro === 'reconocimientoFacial' ? 'Facial' : 'Manual'}
+                          {asistencia.metodo_registro === 'reconocimientoFacial'}
                         </Badge>
                       </td>
                     </tr>

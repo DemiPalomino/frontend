@@ -12,7 +12,7 @@ export const useFaceApi = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
-  
+
   const modelsLoadedRef = useRef(false);
 
   const loadModels = async (): Promise<boolean> => {
@@ -29,20 +29,20 @@ export const useFaceApi = () => {
       const MODEL_URL = '/models';
       console.log('🔄 Iniciando carga de modelos de reconocimiento facial...');
 
-      // Cargar modelos secuencialmente con progreso
+   
       const models = [
-        { 
-          name: 'SSD MobilenetV1', 
+        {
+          name: 'SSD MobilenetV1',
           loader: () => faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL),
           progress: 25
         },
-        { 
-          name: 'Face Landmark 68', 
+        {
+          name: 'Face Landmark 68',
           loader: () => faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
           progress: 50
         },
-        { 
-          name: 'Face Recognition', 
+        {
+          name: 'Face Recognition',
           loader: () => faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL),
           progress: 100
         }
@@ -62,9 +62,9 @@ export const useFaceApi = () => {
 
     } catch (err: any) {
       console.error('❌ Error crítico cargando modelos:', err);
-      
+
       let errorMessage = 'Error al cargar los modelos de reconocimiento facial';
-      
+
       if (err.message?.includes('404') || err.message?.includes('No se pueden acceder')) {
         errorMessage = 'Error: No se pueden cargar los modelos de IA. Verifica la estructura de archivos.';
       } else if (err.message?.includes('Failed to fetch')) {
@@ -72,7 +72,7 @@ export const useFaceApi = () => {
       } else if (err.name === 'TypeError') {
         errorMessage = 'Error de tipo al cargar modelos. Los archivos podrían estar corruptos.';
       }
-      
+
       setError(errorMessage);
       return false;
     } finally {
@@ -98,57 +98,61 @@ export const useFaceApi = () => {
         .withFaceDescriptors();
 
       console.log(`✅ Se detectaron ${detections.length} rostros`);
-      
-      return detections.map(detection => ({
+
+      return detections.map((detection: { detection: any; landmarks: any; descriptor: any; }) => ({
         detection: detection.detection,
         landmarks: detection.landmarks,
         descriptor: detection.descriptor
       }));
     } catch (error) {
       console.error('❌ Error en detección facial:', error);
+
       
-      // Manejo seguro del error
       let errorMessage = 'Error al detectar rostros';
       if (error instanceof Error) {
         errorMessage = `Error al detectar rostros: ${error.message}`;
       } else if (typeof error === 'string') {
         errorMessage = `Error al detectar rostros: ${error}`;
       }
-      
+
       throw new Error(errorMessage);
     }
   };
 
   const recognizeFace = async (
-    descriptor: Float32Array, 
-    knownDescriptors: Array<{id: number, descriptor: Float32Array}>, 
+    inputDescriptor: Float32Array,
+    empleados: Array<{ id: number, descriptor: Float32Array }>,
     threshold: number = 0.6
-  ): Promise<{id: number, distance: number} | null> => {
-    if (!knownDescriptors.length) {
-      console.warn('⚠️ No hay descriptores conocidos para comparar');
+  ) => {
+    try {
+      let mejorSimilitud = 0;
+      let empleadoReconocido = null;
+
+      for (const empleado of empleados) {
+        const similitud = await faceapi.euclideanDistance(
+          inputDescriptor,
+          empleado.descriptor
+        );
+
+        console.log(`🔍 Comparando con empleado ${empleado.id}: ${similitud}`);
+
+        if (similitud < threshold && similitud > mejorSimilitud) {
+          mejorSimilitud = similitud;
+          empleadoReconocido = empleado;
+        }
+      }
+
+      return empleadoReconocido ? {
+        id: empleadoReconocido.id,
+        similitud: mejorSimilitud
+      } : null;
+    } catch (error) {
+      console.error('Error en reconocimiento:', error);
       return null;
     }
-
-    let bestMatch = {
-      id: -1,
-      distance: Number.MAX_VALUE
-    };
-
-    knownDescriptors.forEach((known) => {
-      const distance = faceapi.euclideanDistance(descriptor, known.descriptor);
-      console.log(`📊 Comparando con empleado ${known.id}: distancia ${distance.toFixed(4)}`);
-      
-      if (distance < bestMatch.distance) {
-        bestMatch = { id: known.id, distance };
-      }
-    });
-
-    console.log(`🎯 Mejor coincidencia: Empleado ${bestMatch.id} con distancia ${bestMatch.distance.toFixed(4)}`);
-
-    return bestMatch.distance < threshold ? bestMatch : null;
   };
 
-  // Precargar modelos automáticamente
+  
   useEffect(() => {
     console.log('🚀 Precargando modelos de face-api.js...');
     loadModels().then(success => {

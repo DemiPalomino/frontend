@@ -71,21 +71,21 @@ export const PermisoPage: React.FC = () => {
         return;
       }
 
-      // ✅ CORREGIDO: Asegurar que las fechas tengan hora
+    
       const fechaInicio = new Date(selectedStartDate);
-      fechaInicio.setHours(8, 0, 0, 0); // Establecer hora de inicio (ej: 8:00 AM)
+      fechaInicio.setHours(8, 0, 0, 0); 
 
       const fechaFin = new Date(selectedEndDate);
-      fechaFin.setHours(17, 0, 0, 0); // Establecer hora de fin (ej: 5:00 PM)
+      fechaFin.setHours(17, 0, 0, 0); 
 
       await crearPermiso({
-        fecha_solicitud: new Date().toISOString(), // Fecha actual
+        fecha_solicitud: new Date().toISOString(), 
         fecha_inicio_ausencia: fechaInicio.toISOString(),
         fecha_fin_ausencia: fechaFin.toISOString(),
         tipo_permiso: requestType,
         justificacion: justification,
         estado: 'pendiente',
-        id_persona: 1, // En una app real, esto vendría del usuario autenticado
+        id_persona: 1, 
       });
 
       alert('Solicitud de permiso enviada exitosamente');

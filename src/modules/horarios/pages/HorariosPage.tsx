@@ -33,7 +33,7 @@ export const HorariosPage: React.FC = () => {
 
   const [nuevoHorario, setNuevoHorario] = useState({
     nombre_horario: '',
-    hora_entrada: '08:00',  // ✅ CAMBIADO: de fecha_inicio
+    hora_entrada: '08:00', 
     hora_salida: '17:00', 
     id_area_trabajo: 0,
     estado: 1
@@ -58,8 +58,8 @@ export const HorariosPage: React.FC = () => {
     setSelectedSchedule(horario);
     setNuevoHorario({
       nombre_horario: horario.nombre_horario,
-      hora_entrada: horario.hora_entrada,  // ✅ CAMBIADO
-      hora_salida: horario.hora_salida,    // ✅ CAMBIADO
+      hora_entrada: horario.hora_entrada,  
+      hora_salida: horario.hora_salida,    
       id_area_trabajo: horario.id_area_trabajo,
       estado: horario.estado
     });
@@ -176,9 +176,9 @@ export const HorariosPage: React.FC = () => {
                     <SelectValue placeholder="Selecciona un área" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="1">Desarrollo</SelectItem>
-                    <SelectItem value="2">Marketing</SelectItem>
-                    <SelectItem value="3">Recursos Humanos</SelectItem>
+                    <SelectItem value="1">Diseño</SelectItem>
+                    <SelectItem value="2">Ventas</SelectItem>
+                    <SelectItem value="3">Ploteo</SelectItem>
                     <SelectItem value="4">Administración</SelectItem>
                   </SelectContent>
                 </Select>
@@ -366,9 +366,9 @@ export const HorariosPage: React.FC = () => {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="1">Desarrollo</SelectItem>
-                    <SelectItem value="2">Marketing</SelectItem>
-                    <SelectItem value="3">Recursos Humanos</SelectItem>
+                    <SelectItem value="1">Diseño</SelectItem>
+                    <SelectItem value="2">Ventas</SelectItem>
+                    <SelectItem value="3">Ploteo</SelectItem>
                     <SelectItem value="4">Administración</SelectItem>
                   </SelectContent>
                 </Select>

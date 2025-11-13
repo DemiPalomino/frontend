@@ -61,7 +61,7 @@ export const SucursalPage: React.FC = () => {
 
 const handleSaveArea = async () => {
   try {
-    // ✅ Validaciones
+ 
     if (!nuevaArea.nombre_area.trim()) {
       alert('El nombre del área es requerido');
       return;
@@ -71,7 +71,7 @@ const handleSaveArea = async () => {
       return;
     }
 
-    // ✅ FALTABA ESTA PARTE CRÍTICA:
+ 
     if (editingArea) {
       await actualizarArea(editingArea.id_area, nuevaArea);
     } else {
@@ -96,13 +96,13 @@ const handleSaveArea = async () => {
     setIsSucursalDialogOpen(true);
   };
 
-  // En sucursalPage.tsx - Mejorar la función de edición
+
   const handleEditArea = (area: any) => {
     setEditingArea(area);
     setNuevaArea({
       nombre_area: area.nombre_area || '',
       descripcion: area.descripcion || '',
-      id_sucursal: area.id_sucursal || 0, // ✅ Valor por defecto
+      id_sucursal: area.id_sucursal || 0, 
     });
     setIsAreaDialogOpen(true);
   };
@@ -341,7 +341,7 @@ const handleSaveArea = async () => {
                         <Label htmlFor="sucursal">Sucursal *</Label>
                         
                         <Select
-                          value={nuevaArea.id_sucursal?.toString() || ""} // ✅ Safe navigation
+                          value={nuevaArea.id_sucursal?.toString() || ""} 
                           onValueChange={(value: string) => setNuevaArea({
                             ...nuevaArea,
                             id_sucursal: value ? parseInt(value) : 0
