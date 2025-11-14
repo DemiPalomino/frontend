@@ -22,15 +22,23 @@ export const useEmpleado = () => {
 
   const crearEmpleado = async (empleadoData: CreateEmpleadoDTO) => {
     try {
-      setError(null);      
-      const empleadoParaBackend = {
-        ...empleadoData,        
-      };
-      const nuevoEmpleado = await empleadoService.create(empleadoParaBackend);
+      setError(null);
+      
+      // ✅ Validación frontend básica
+      if (!empleadoData.nombre_usuario || !empleadoData.contrasena) {
+        throw new Error('Nombre de usuario y contraseña son requeridos');
+      }
+
+      if (empleadoData.contrasena.length < 6) {
+        throw new Error('La contraseña debe tener al menos 6 caracteres');
+      }
+
+      const nuevoEmpleado = await empleadoService.create(empleadoData);
       setEmpleados(prev => [...prev, nuevoEmpleado]);
       return nuevoEmpleado;
     } catch (err: any) {
-      setError(err.message || 'Error al crear empleado');
+      const errorMessage = err.message || 'Error al crear empleado';
+      setError(errorMessage);
       throw err;
     }
   };

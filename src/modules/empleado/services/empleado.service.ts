@@ -23,6 +23,10 @@ export interface CreateEmpleadoDTO {
   telefono: string; 
   fecha_nacimiento: string; 
   id_area_trabajo: number;
+  // ✅ Nuevos campos para crear usuario
+  nombre_usuario?: string;
+  contrasena?: string;
+  id_tipo_usuario?: number;
 }
 
 export const empleadoService = {

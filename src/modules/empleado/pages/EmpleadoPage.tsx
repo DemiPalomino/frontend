@@ -10,6 +10,7 @@ import {
   Users, Plus, Search, Edit, Trash, Mail, Phone, Calendar, Building,
   Eye, UserPlus
 } from 'lucide-react';
+import { useAreas } from '../controllers/useAreas';
 
 export const EmpleadoPage: React.FC = () => {
   const {
@@ -21,6 +22,8 @@ export const EmpleadoPage: React.FC = () => {
     eliminarEmpleado,
     toggleActivo
   } = useEmpleado();
+
+  const { areas, getAreaNombre } = useAreas();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [modalAbierto, setModalAbierto] = useState(false);
@@ -34,13 +37,7 @@ export const EmpleadoPage: React.FC = () => {
   );
 
   const getAreaName = (areaId: number) => {
-    const areas: { [key: number]: string } = {
-      1: 'Administración',
-      2: 'Diseño',
-      3: 'Ploteo',
-      4: 'Ventas'
-    };
-    return areas[areaId] || 'Sin área';
+    return getAreaNombre(areaId);
   };
 
   const handleCrearEmpleado = async (empleadoData: any) => {
