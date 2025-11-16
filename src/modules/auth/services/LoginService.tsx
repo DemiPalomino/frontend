@@ -25,7 +25,7 @@ export async function LoginService(usuario: string, password: string): Promise<L
         
         return response;
     } catch (error: any) {
-        console.error('🔴 Error en LoginService:', error);
+        console.error('Error en LoginService:', error);
         throw new Error(error.message || 'Error de conexión con el servidor');
     }
 }

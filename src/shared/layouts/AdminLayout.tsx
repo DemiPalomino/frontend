@@ -39,12 +39,23 @@ export default function AdminLayout() {
     { path: "/configuracion", label: "Configuración", icon: Settings, roles: [1] },
   ];
 
-  // Filtrar menú según el rol del usuario
+    // Filtrar menú según el rol del usuario
+  const userRole = user?.id_tipo_usuario || user?.role;
   const filteredMenuItems = menuItems.filter(item => 
-    item.roles.includes(user?.id_tipo_usuario || user?.role || 2)
+    item.roles.includes(userRole || 2)
   );
 
-  return (
+  // Función para obtener el nombre del rol
+  const getRoleName = () => {
+    const role = user?.id_tipo_usuario || user?.role;
+    
+    if (role === 1) return 'Administrador';
+    if (role === 2) return 'Empleado';
+    
+    return 'Usuario';
+  };
+
+    return (
     <div className="flex h-screen">
       {/* Panel lateral */}
       <div className="w-64 bg-white border-r border-gray-200 flex flex-col">
@@ -68,8 +79,7 @@ export default function AdminLayout() {
                 {user?.nombres} {user?.apellidos}
               </p>
               <p className="text-xs text-gray-500 capitalize">
-                {user?.id_tipo_usuario === 1 ? 'Administrador' : 'Empleado' }
-                 
+                {getRoleName()}
               </p>
             </div>
           </div>
