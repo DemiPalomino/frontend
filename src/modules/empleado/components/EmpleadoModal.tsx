@@ -36,7 +36,7 @@ export const EmpleadoModal: React.FC<EmpleadoModalProps> = ({
     telefono: '',
     fecha_nacimiento: '',
     id_area_trabajo: 0,
-    // Datos de usuario (solo para creación)
+    // Datos de usuario 
     nombre_usuario: '',
     contrasena: '',
     id_tipo_usuario: 2 // Por defecto: Empleado
@@ -79,7 +79,7 @@ export const EmpleadoModal: React.FC<EmpleadoModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-     // ✅ VALIDACIÓN MEJORADA: Verificar que se seleccionó área
+     // VALIDACIÓN MEJORADA: Verificar que se seleccionó área
     if (formData.id_area_trabajo === 0) {
       setError('Debe seleccionar un área de trabajo');
       return;
@@ -89,7 +89,7 @@ export const EmpleadoModal: React.FC<EmpleadoModalProps> = ({
     setError(null);
     
     try {
-      // ✅ Para edición, no enviamos datos de usuario
+      // Para edición, no enviamos datos de usuario
       const dataToSend = empleado 
         ? { ...formData, nombre_usuario: undefined, contrasena: undefined, id_tipo_usuario: undefined }
         : formData;

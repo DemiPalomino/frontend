@@ -24,7 +24,7 @@ export const useEmpleado = () => {
     try {
       setError(null);
       
-      // ✅ Validación frontend básica
+      // Validación frontend básica
       if (!empleadoData.nombre_usuario || !empleadoData.contrasena) {
         throw new Error('Nombre de usuario y contraseña son requeridos');
       }
