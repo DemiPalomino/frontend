@@ -34,20 +34,20 @@ export const registroAsistenciaService = {
 
   obtenerDescriptoresEmpleados: async (): Promise<any[]> => {
   try {
-    console.log('📥 Obteniendo descriptores reales de empleados...');
+    console.log('Obteniendo descriptores reales de empleados...');
     const response = await apiFetch("/personas/descriptores");
     
     if (!response || !Array.isArray(response)) {
       throw new Error('Respuesta inválida del servidor');
     }
     
-    console.log('✅ Descriptores obtenidos del backend:', response.length, 'empleados');
+    console.log('Descriptores obtenidos del backend:', response.length, 'empleados');
     return response;
   } catch (error: any) {
-    console.error('❌ Error obteniendo descriptores reales:', error);
+    console.error('Error obteniendo descriptores reales:', error);
     
  
-    console.log('🔄 Usando datos de prueba para desarrollo...');
+    console.log('Usando datos de prueba para desarrollo...');
     const datosPrueba = [
       {
         id_persona: 1,
@@ -72,7 +72,7 @@ export const registroAsistenciaService = {
       }
     ];
     
-    console.log('📋 Datos de prueba generados:', datosPrueba.length, 'empleados');
+    console.log('Datos de prueba generados:', datosPrueba.length, 'empleados');
     return datosPrueba;
   }
 },

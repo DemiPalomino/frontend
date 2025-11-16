@@ -17,7 +17,7 @@ export const useFaceApi = () => {
 
   const loadModels = async (): Promise<boolean> => {
     if (modelsLoadedRef.current) {
-      console.log('✅ Modelos ya cargados');
+      console.log('Modelos ya cargados');
       return true;
     }
 
@@ -27,7 +27,7 @@ export const useFaceApi = () => {
       setProgress(0);
 
       const MODEL_URL = '/models';
-      console.log('🔄 Iniciando carga de modelos de reconocimiento facial...');
+      console.log('Iniciando carga de modelos de reconocimiento facial...');
 
    
       const models = [
@@ -49,19 +49,19 @@ export const useFaceApi = () => {
       ];
 
       for (let i = 0; i < models.length; i++) {
-        console.log(`📦 Cargando ${models[i].name}...`);
+        console.log(`Cargando ${models[i].name}...`);
         await models[i].loader();
         setProgress(models[i].progress);
-        console.log(`✅ ${models[i].name} cargado correctamente`);
+        console.log(` ${models[i].name} cargado correctamente`);
       }
 
-      console.log('🎉 Todos los modelos cargados exitosamente');
+      console.log('Todos los modelos cargados exitosamente');
       modelsLoadedRef.current = true;
       setModelsLoaded(true);
       return true;
 
     } catch (err: any) {
-      console.error('❌ Error crítico cargando modelos:', err);
+      console.error('Error crítico cargando modelos:', err);
 
       let errorMessage = 'Error al cargar los modelos de reconocimiento facial';
 
@@ -91,13 +91,13 @@ export const useFaceApi = () => {
         minConfidence: 0.5
       });
 
-      console.log('🔍 Iniciando detección facial...');
+      console.log('Iniciando detección facial...');
       const detections = await faceapi
         .detectAllFaces(videoElement, detectionOptions)
         .withFaceLandmarks()
         .withFaceDescriptors();
 
-      console.log(`✅ Se detectaron ${detections.length} rostros`);
+      console.log(`Se detectaron ${detections.length} rostros`);
 
       return detections.map((detection: { detection: any; landmarks: any; descriptor: any; }) => ({
         detection: detection.detection,
@@ -105,7 +105,7 @@ export const useFaceApi = () => {
         descriptor: detection.descriptor
       }));
     } catch (error) {
-      console.error('❌ Error en detección facial:', error);
+      console.error('Error en detección facial:', error);
 
       
       let errorMessage = 'Error al detectar rostros';
@@ -134,7 +134,7 @@ export const useFaceApi = () => {
           empleado.descriptor
         );
 
-        console.log(`🔍 Comparando con empleado ${empleado.id}: ${similitud}`);
+        console.log(`Comparando con empleado ${empleado.id}: ${similitud}`);
 
         if (similitud < threshold && similitud > mejorSimilitud) {
           mejorSimilitud = similitud;
@@ -154,12 +154,12 @@ export const useFaceApi = () => {
 
   
   useEffect(() => {
-    console.log('🚀 Precargando modelos de face-api.js...');
+    console.log('Precargando modelos de face-api.js...');
     loadModels().then(success => {
       if (success) {
-        console.log('🎉 Precarga de modelos completada');
+        console.log(' Precarga de modelos completada');
       } else {
-        console.error('❌ Falló la precarga de modelos');
+        console.error(' Falló la precarga de modelos');
       }
     });
   }, []);

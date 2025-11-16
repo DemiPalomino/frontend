@@ -16,8 +16,7 @@ interface EmpleadoModalProps {
 
 const tiposUsuario = [
   { id: 1, nombre: 'Administrador' },
-  { id: 2, nombre: 'Empleado' },
-  { id: 3, nombre: 'Supervisor' }
+  { id: 2, nombre: 'Empleado' }
 ];
 
 export const EmpleadoModal: React.FC<EmpleadoModalProps> = ({

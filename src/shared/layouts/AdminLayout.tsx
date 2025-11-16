@@ -29,15 +29,20 @@ export default function AdminLayout() {
   };
 
   const menuItems = [
-    { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard, active: true },
-    { path: "/registro", label: "Registro Asistencia", icon: ClipboardList, active: true },
-    { path: "/empleados", label: "Empleados", icon: Users, active: true },
-    { path: "/sucursales", label: "Sucursales y Áreas", icon: Building, active: true },
-    { path: "/reportes", label: "Reportes", icon: BarChart3, active: true },
-    { path: "/permisos", label: "Permisos", icon: Clock, active: true },
-    { path: "/horarios", label: "Horarios", icon: Clock, active: true },
-    { path: "/configuracion", label: "Configuración", icon: Settings, active: true },
+    { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard, roles: [1, 2] },
+    { path: "/registro", label: "Registro Asistencia", icon: ClipboardList, roles: [1, 2] },
+    { path: "/empleados", label: "Empleados", icon: Users, roles: [1] },
+    { path: "/sucursales", label: "Sucursales y Áreas", icon: Building, roles: [1] },
+    { path: "/reportes", label: "Reportes", icon: BarChart3, roles: [1] },
+    { path: "/permisos", label: "Permisos", icon: Clock, roles: [1, 2] },
+    { path: "/horarios", label: "Horarios", icon: Clock, roles: [1] },
+    { path: "/configuracion", label: "Configuración", icon: Settings, roles: [1] },
   ];
+
+  // Filtrar menú según el rol del usuario
+  const filteredMenuItems = menuItems.filter(item => 
+    item.roles.includes(user?.id_tipo_usuario || user?.role || 2)
+  );
 
   return (
     <div className="flex h-screen">
@@ -63,8 +68,8 @@ export default function AdminLayout() {
                 {user?.nombres} {user?.apellidos}
               </p>
               <p className="text-xs text-gray-500 capitalize">
-                {user?.role === 1 ? 'Administrador' : 
-                 user?.role === 2 ? 'Supervisor' : 'Empleado'}
+                {user?.id_tipo_usuario === 1 ? 'Administrador' : 'Empleado' }
+                 
               </p>
             </div>
           </div>
@@ -73,40 +78,31 @@ export default function AdminLayout() {
         {/* Navegación */}
         <nav className="flex-1 p-4 overflow-y-auto">
           <ul className="space-y-1">
-            {menuItems.map((item) => {
+            {filteredMenuItems.map((item) => {
               const Icon = item.icon;
               const isActive = location.pathname === item.path;
               
               return (
                 <li key={item.path}>
-                  {item.active ? (
-                    <Link 
-                      to={item.path}
-                      className={`flex items-center gap-3 py-3 px-3 rounded-lg text-sm font-medium transition-colors ${
-                        isActive 
-                          ? "bg-blue-50 text-blue-600 border border-blue-200" 
-                          : "text-gray-700 hover:bg-gray-100"
-                      }`}
-                    >
-                      <div className={`w-5 h-5 flex items-center justify-center ${
-                        isActive ? "text-blue-600" : "text-gray-400"
-                      }`}>
-                        {isActive ? (
-                          <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                        ) : (
-                          <Icon className="w-4 h-4" />
-                        )}
-                      </div>
-                      <span>{item.label}</span>
-                    </Link>
-                  ) : (
-                    <div className="flex items-center gap-3 py-3 px-3 rounded-lg text-sm font-medium text-gray-400 cursor-not-allowed">
-                      <div className="w-5 h-5 flex items-center justify-center">
+                  <Link 
+                    to={item.path}
+                    className={`flex items-center gap-3 py-3 px-3 rounded-lg text-sm font-medium transition-colors ${
+                      isActive 
+                        ? "bg-blue-50 text-blue-600 border border-blue-200" 
+                        : "text-gray-700 hover:bg-gray-100"
+                    }`}
+                  >
+                    <div className={`w-5 h-5 flex items-center justify-center ${
+                      isActive ? "text-blue-600" : "text-gray-400"
+                    }`}>
+                      {isActive ? (
+                        <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                      ) : (
                         <Icon className="w-4 h-4" />
-                      </div>
-                      <span>{item.label}</span>
+                      )}
                     </div>
-                  )}
+                    <span>{item.label}</span>
+                  </Link>
                 </li>
               );
             })}

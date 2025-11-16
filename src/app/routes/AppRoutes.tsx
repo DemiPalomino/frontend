@@ -11,6 +11,33 @@ import RegistroAsistenciaPage from "../../modules/registroAsistencia/pages/regis
 import ReportesPage from "../../modules/reportes/pages/ReportesPage";
 import SucursalPage from "../../modules/sucursales/pages/SucursalPage";
 import ConfiguracionPages from "../../modules/configuracion/pages/ConfiguracionPages";
+import { ReactElement } from "react";
+
+// Componente para protección por roles
+const RoleProtectedRoute = ({ 
+  children, 
+  allowedRoles 
+}: { 
+  children: ReactElement; 
+  allowedRoles: number[] 
+}) => {
+  const userStr = localStorage.getItem('user');
+  let user;
+  
+  try {
+    user = userStr ? JSON.parse(userStr) : {};
+  } catch (error) {
+    user = {};
+  }
+  
+  const userRole = user?.id_tipo_usuario || user?.role;
+  
+  if (!userRole || !allowedRoles.includes(userRole)) {
+    return <Navigate to="/dashboard" replace />;
+  }
+  
+  return children;
+};
 
 export default function AppRoutes() {
     return (
@@ -23,44 +50,75 @@ export default function AppRoutes() {
                 
                 {/* Rutas protegidas */}
                 <Route element={<AdminLayout />}>
+                    {/* Dashboard - accesible para todos los roles */}
                     <Route path="/dashboard" element={
                         <ProtectedRoute>
-                            <DashboardPage />
+                            <RoleProtectedRoute allowedRoles={[1, 2]}>
+                                <DashboardPage />
+                            </RoleProtectedRoute>
                         </ProtectedRoute>
                     } />
+                    
+                    {/* Empleados - solo Admin */}
                     <Route path="/empleados" element={
                         <ProtectedRoute>
-                            <EmpleadoPage />
+                            <RoleProtectedRoute allowedRoles={[1]}>
+                                <EmpleadoPage />
+                            </RoleProtectedRoute>
                         </ProtectedRoute>
                     } />
+                    
+                    {/* Horarios - solo Admin */}
                     <Route path="/horarios" element={
                         <ProtectedRoute>
-                            <HorariosPage />
+                            <RoleProtectedRoute allowedRoles={[1]}>
+                                <HorariosPage />
+                            </RoleProtectedRoute>
                         </ProtectedRoute>
                     } />
+                    
+                    {/* Permisos - accesible para todos */}
                     <Route path="/permisos" element={
                         <ProtectedRoute>
-                            <PermisoPage />
+                            <RoleProtectedRoute allowedRoles={[1, 2]}>
+                                <PermisoPage />
+                            </RoleProtectedRoute>
                         </ProtectedRoute>
                     } />
+                    
+                    {/* Registro Asistencia - accesible para todos */}
                     <Route path="/registro" element={
                         <ProtectedRoute>
-                            <RegistroAsistenciaPage />
+                            <RoleProtectedRoute allowedRoles={[1, 2]}>
+                                <RegistroAsistenciaPage />
+                            </RoleProtectedRoute>
                         </ProtectedRoute>
                     } />
+                    
+                    {/* Reportes - solo Admin */}
                     <Route path="/reportes" element={
                         <ProtectedRoute>
-                            <ReportesPage />
+                            <RoleProtectedRoute allowedRoles={[1]}>
+                                <ReportesPage />
+                            </RoleProtectedRoute>
                         </ProtectedRoute>
                     } />
+                    
+                    {/* Sucursales - solo Admin */}
                     <Route path="/sucursales" element={
                         <ProtectedRoute>
-                            <SucursalPage />
+                            <RoleProtectedRoute allowedRoles={[1]}>
+                                <SucursalPage />
+                            </RoleProtectedRoute>
                         </ProtectedRoute>
                     } />
+                    
+                    {/* Configuración - solo Admin */}
                     <Route path="/configuracion" element={
                         <ProtectedRoute>
-                            <ConfiguracionPages />
+                            <RoleProtectedRoute allowedRoles={[1]}>
+                                <ConfiguracionPages />
+                            </RoleProtectedRoute>
                         </ProtectedRoute>
                     } />
                 </Route>
