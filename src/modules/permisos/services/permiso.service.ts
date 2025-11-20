@@ -25,9 +25,10 @@ export interface CreatePermisoDTO {
 }
 
 export const permisoService = {
-  getAll: async (): Promise<Permiso[]> => {
+  getAll: async (idPersona?: number): Promise<Permiso[]> => {
     try {
-      return await apiFetch("/permisos");
+      const url = idPersona ? `/permisos?id_persona=${idPersona}` : '/permisos';
+      return await apiFetch(url);
     } catch (error) {
       console.error('Error en permisos:', error);
       throw new Error('No se pudieron cargar los permisos');

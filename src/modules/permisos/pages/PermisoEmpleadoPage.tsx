@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { usePermiso } from '../controllers/usePermiso';
+import { useAuth } from "../../../modules/auth/hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card';
 import { Button } from '../../../components/ui/button';
 import { Badge } from '../../../components/ui/badge';
@@ -20,15 +21,14 @@ import {
   User
 } from 'lucide-react';
 
-export const PermisoPage: React.FC = () => {
+export const PermisoEmpleadoPage: React.FC = () => {
+  const { user } = useAuth();
   const {
     permisos,
     loading,
     error,
     crearPermiso,
-    aprobarPermiso,
-    rechazarPermiso
-  } = usePermiso();
+  } = usePermiso({ idPersona: user?.id_persona });
 
   const [showRequestDialog, setShowRequestDialog] = useState(false);
   const [selectedStartDate, setSelectedStartDate] = useState<Date>();
@@ -71,7 +71,11 @@ export const PermisoPage: React.FC = () => {
         return;
       }
 
-    
+      if (!user?.id_persona) {
+        alert('Error: No se pudo identificar al empleado');
+        return;
+      }
+
       const fechaInicio = new Date(selectedStartDate);
       fechaInicio.setHours(8, 0, 0, 0); 
 
@@ -85,7 +89,7 @@ export const PermisoPage: React.FC = () => {
         tipo_permiso: requestType,
         justificacion: justification,
         estado: 'pendiente',
-        id_persona: 1, 
+        id_persona: user.id_persona,
       });
 
       alert('Solicitud de permiso enviada exitosamente');
@@ -100,30 +104,12 @@ export const PermisoPage: React.FC = () => {
     }
   };
 
-  const handleApproveRequest = async (id: number) => {
-    try {
-      await aprobarPermiso(id);
-      alert('Solicitud aprobada exitosamente');
-    } catch (error) {
-      alert('Error al aprobar la solicitud');
-    }
-  };
-
-  const handleRejectRequest = async (id: number) => {
-    try {
-      await rechazarPermiso(id);
-      alert('Solicitud rechazada exitosamente');
-    } catch (error) {
-      alert('Error al rechazar la solicitud');
-    }
-  };
-
   if (loading) {
     return (
       <div className="p-6 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-2 text-gray-600">Cargando permisos...</p>
+          <p className="mt-2 text-gray-600">Cargando mis permisos...</p>
         </div>
       </div>
     );
@@ -144,11 +130,11 @@ export const PermisoPage: React.FC = () => {
 
   return (
     <div className="p-6 space-y-6">
-      {/* cabecera */}
+      {/* Cabecera */}
       <div className="flex justify-between items-center border-b border-gray-200 pb-4">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Permisos y Justificaciones</h1>
-          <p className="text-gray-600">Gestiona las solicitudes de permisos y ausencias del personal</p>
+          <h1 className="text-2xl font-semibold text-gray-900">Mis Permisos y Justificaciones</h1>
+          <p className="text-gray-600">Gestiona tus solicitudes de permisos y ausencias</p>
         </div>
         <Dialog open={showRequestDialog} onOpenChange={setShowRequestDialog}>
           <DialogTrigger asChild>
@@ -246,6 +232,7 @@ export const PermisoPage: React.FC = () => {
         </Dialog>
       </div>
 
+      {/* Estadísticas personales */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card>
           <CardContent className="p-6">
@@ -302,17 +289,18 @@ export const PermisoPage: React.FC = () => {
         </Card>
       </div>
 
-      {/* Lista de permisos */}
+      {/* Lista de permisos del empleado */}
       <Card>
         <CardHeader>
-          <CardTitle>Solicitudes de Permisos</CardTitle>
+          <CardTitle>Mis Solicitudes de Permisos</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             {permisos.length === 0 ? (
               <div className="text-center py-8 text-gray-500">
                 <FileText className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-                <p>No hay solicitudes de permisos registradas.</p>
+                <p>No has realizado ninguna solicitud de permiso.</p>
+                <p className="text-sm">Haz clic en "Nueva Solicitud" para crear una.</p>
               </div>
             ) : (
               permisos.map((permiso) => {
@@ -325,9 +313,8 @@ export const PermisoPage: React.FC = () => {
                         <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
                           <User className="w-6 h-6 text-gray-600" />
                         </div>
-                        <div>{/* {user?.nombres} {user?.apellidos} */}
-                          <h3 className="font-medium">Empleado: {permiso?.nombres} {permiso?.apellidos}</h3>
-                          <p className="text-sm text-gray-600">Solicitud #{permiso.id_permiso}</p>
+                        <div>
+                          <h3 className="font-medium">Solicitud #{permiso.id_permiso}</h3>
                           <div className="flex items-center space-x-2 mt-1">
                             <span className={`px-2 py-1 rounded-full text-xs font-medium ${getTypeColor(permiso.tipo_permiso)}`}>
                               {permiso.tipo_permiso.charAt(0).toUpperCase() + permiso.tipo_permiso.slice(1)}
@@ -355,28 +342,6 @@ export const PermisoPage: React.FC = () => {
                       <p className="text-sm text-gray-600 mb-2"><strong>Justificación:</strong></p>
                       <p className="text-sm bg-gray-50 p-3 rounded border">{permiso.justificacion}</p>
                     </div>
-
-                    {permiso.estado === 'pendiente' && (
-                      <div className="flex justify-end space-x-2 mt-4 pt-4 border-t">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleRejectRequest(permiso.id_permiso)}
-                          className="text-red-600 hover:text-red-700"
-                        >
-                          <XCircle className="w-4 h-4 mr-1" />
-                          Rechazar
-                        </Button>
-                        <Button
-                          size="sm"
-                          onClick={() => handleApproveRequest(permiso.id_permiso)}
-                          className="text-green-600 hover:text-green-700"
-                        >
-                          <CheckCircle className="w-4 h-4 mr-1" />
-                          Aprobar
-                        </Button>
-                      </div>
-                    )}
                   </div>
                 );
               })
@@ -387,4 +352,5 @@ export const PermisoPage: React.FC = () => {
     </div>
   );
 };
-export default PermisoPage;
+
+export default PermisoEmpleadoPage;

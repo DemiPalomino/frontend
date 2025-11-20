@@ -34,7 +34,8 @@ export default function AdminLayout() {
     { path: "/empleados", label: "Empleados", icon: Users, roles: [1] },
     { path: "/sucursales", label: "Sucursales y Áreas", icon: Building, roles: [1] },
     { path: "/reportes", label: "Reportes", icon: BarChart3, roles: [1] },
-    { path: "/permisos", label: "Permisos", icon: Clock, roles: [1, 2] },
+    { path: "/permisos", label: "Permisos", icon: Clock, roles: [1] },
+    { path: "/mis-permisos", label: "Mis Permisos", icon: Clock, roles: [2] },
     { path: "/horarios", label: "Horarios", icon: Clock, roles: [1] },
     { path: "/configuracion", label: "Configuración", icon: Settings, roles: [1] },
   ];

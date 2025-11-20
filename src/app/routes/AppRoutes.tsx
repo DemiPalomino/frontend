@@ -12,6 +12,7 @@ import ReportesPage from "../../modules/reportes/pages/ReportesPage";
 import SucursalPage from "../../modules/sucursales/pages/SucursalPage";
 import ConfiguracionPages from "../../modules/configuracion/pages/ConfiguracionPages";
 import { ReactElement } from "react";
+import PermisoEmpleadoPage from "../../modules/permisos/pages/PermisoEmpleadoPage";
 
 const RoleProtectedRoute = ({ 
   children, 
@@ -75,15 +76,24 @@ export default function AppRoutes() {
                         </ProtectedRoute>
                     } />
                     
-                    {/* Para todos */}
+                    {/* Solo Admin */}
                     <Route path="/permisos" element={
                         <ProtectedRoute>
-                            <RoleProtectedRoute allowedRoles={[1, 2]}>
+                            <RoleProtectedRoute allowedRoles={[1]}>
                                 <PermisoPage />
                             </RoleProtectedRoute>
                         </ProtectedRoute>
                     } />
                     
+                    {/* Solo Empleado */}
+                    <Route path="/mis-permisos" element={
+                        <ProtectedRoute>
+                            <RoleProtectedRoute allowedRoles={[2]}>
+                                <PermisoEmpleadoPage />
+                            </RoleProtectedRoute>
+                        </ProtectedRoute>
+                    } />
+
                     {/* Para todos */}
                     <Route path="/registro" element={
                         <ProtectedRoute>

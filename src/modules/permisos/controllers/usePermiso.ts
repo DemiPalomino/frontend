@@ -1,7 +1,11 @@
 import { useState, useEffect } from 'react';
 import { permisoService, Permiso, CreatePermisoDTO } from '../services/permiso.service';
 
-export const usePermiso = () => {
+interface UsePermisoProps {
+  idPersona?: number; 
+}
+
+export const usePermiso = ({ idPersona }: UsePermisoProps = {}) => {
   const [permisos, setPermisos] = useState<Permiso[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -10,7 +14,7 @@ export const usePermiso = () => {
     try {
       setLoading(true);
       setError(null);
-      const data = await permisoService.getAll();
+      const data = await permisoService.getAll(idPersona);
       setPermisos(data);
     } catch (err: any) {
       setError(err.message || 'Error al cargar permisos');
@@ -65,7 +69,7 @@ export const usePermiso = () => {
 
   useEffect(() => {
     cargarPermisos();
-  }, []);
+  }, [idPersona]);
 
   return {
     permisos,
