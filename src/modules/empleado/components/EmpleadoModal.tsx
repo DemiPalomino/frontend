@@ -27,18 +27,17 @@ export const EmpleadoModal: React.FC<EmpleadoModalProps> = ({
 }) => {
   const { areas, loading: loadingAreas } = useAreas();
   const [formData, setFormData] = useState({
-    // Datos personales
     dni: '',
     nombres: '',
     apellidos: '',
     email: '',
     telefono: '',
     fecha_nacimiento: '',
-    id_area_trabajo: 0,
+    id_area_trabajo: 1,
     // Datos de usuario 
     nombre_usuario: '',
     contrasena: '',
-    id_tipo_usuario: 2 // Por defecto: Empleado
+    id_tipo_usuario: 2 
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -53,7 +52,7 @@ export const EmpleadoModal: React.FC<EmpleadoModalProps> = ({
         telefono: empleado.telefono,
         fecha_nacimiento: empleado.fecha_nacimiento.split('T')[0],
         id_area_trabajo: empleado.id_area_trabajo,
-        // No mostramos datos de usuario en edición por seguridad
+        // No se muestra datos de usuario por seguridad
         nombre_usuario: '',
         contrasena: '',
         id_tipo_usuario: 2
@@ -66,7 +65,7 @@ export const EmpleadoModal: React.FC<EmpleadoModalProps> = ({
         email: '',
         telefono: '',
         fecha_nacimiento: '',
-        id_area_trabajo: 0,
+        id_area_trabajo: 1,
         nombre_usuario: '',
         contrasena: '',
         id_tipo_usuario: 2
@@ -78,7 +77,6 @@ export const EmpleadoModal: React.FC<EmpleadoModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-     // VALIDACIÓN MEJORADA: Verificar que se seleccionó área
     if (formData.id_area_trabajo === 0) {
       setError('Debe seleccionar un área de trabajo');
       return;
@@ -88,7 +86,7 @@ export const EmpleadoModal: React.FC<EmpleadoModalProps> = ({
     setError(null);
     
     try {
-      // Para edición, no enviamos datos de usuario
+
       const dataToSend = empleado 
         ? { ...formData, nombre_usuario: undefined, contrasena: undefined, id_tipo_usuario: undefined }
         : formData;

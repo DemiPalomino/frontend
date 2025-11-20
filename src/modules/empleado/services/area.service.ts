@@ -13,7 +13,7 @@ export const areaService = {
     try {
       return await apiFetch("/areas");
     } catch (error) {
-      console.error('Error fetching areas:', error);
+      console.error('Error en areas:', error);
       throw new Error('No se pudieron cargar las áreas de trabajo');
     }
   },
@@ -22,7 +22,7 @@ export const areaService = {
     try {
       return await apiFetch(`/areas/${id}`);
     } catch (error) {
-      console.error(`Error fetching area ${id}:`, error);
+      console.error(`Error en area ${id}:`, error);
       throw new Error('No se pudo cargar el área de trabajo');
     }
   }

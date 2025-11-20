@@ -134,7 +134,7 @@ const handleSaveArea = async () => {
 
   const resetAreaForm = () => {
     setEditingArea(null);
-    setNuevaArea({ nombre_area: '', descripcion: '', id_sucursal: 0 });
+    setNuevaArea({ nombre_area: '', descripcion: '', id_sucursal: 1 });
   };
 
   if (loading) {
@@ -202,7 +202,7 @@ const handleSaveArea = async () => {
                     </DialogHeader>
                     <div className="space-y-4 py-4">
                       <div className="space-y-2">
-                        <Label htmlFor="nombre_sucursal">Nombre de la Sucursal *</Label>
+                        <Label htmlFor="nombre_sucursal">Nombre de la Sucursal</Label>
                         <Input
                           id="nombre_sucursal"
                           value={nuevaSucursal.nombre_sucursal}
@@ -211,7 +211,7 @@ const handleSaveArea = async () => {
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="direccion">Dirección *</Label>
+                        <Label htmlFor="direccion">Dirección</Label>
                         <Textarea
                           id="direccion"
                           value={nuevaSucursal.direccion}
@@ -338,7 +338,7 @@ const handleSaveArea = async () => {
                     </DialogHeader>
                     <div className="space-y-4 py-4">
                       <div className="space-y-2">
-                        <Label htmlFor="sucursal">Sucursal *</Label>
+                        <Label htmlFor="sucursal">Sucursal</Label>
                         
                         <Select
                           value={nuevaArea.id_sucursal?.toString() || ""} 
@@ -360,7 +360,7 @@ const handleSaveArea = async () => {
                         </Select>
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="nombre_area">Nombre del Área *</Label>
+                        <Label htmlFor="nombre_area">Nombre del Área</Label>
                         <Input
                           id="nombre_area"
                           value={nuevaArea.nombre_area}

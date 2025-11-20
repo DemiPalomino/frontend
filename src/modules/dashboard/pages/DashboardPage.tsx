@@ -3,9 +3,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui
 import { Badge } from '../../../components/ui/badge';
 import { useDashboard } from '../controllers/useDashboard';
 import { Users, Clock, CheckCircle, AlertTriangle, Building2 } from 'lucide-react';
+import { useAuth } from "../../../modules/auth/hooks/useAuth";
+import { useConfiguracion } from "../../configuracion/controllers/useConfiguracion";
 
 export const DashboardPage: React.FC = () => {
   const { estadisticas, loading, error } = useDashboard();
+  const { user } = useAuth();
+  const { empresa } = useConfiguracion();
 
   if (loading) {
     return (
@@ -30,10 +34,10 @@ export const DashboardPage: React.FC = () => {
 
   return (
     <div className="p-6 space-y-6">
-      {/* Header */}
+      {/* Cabecera */}
       <div className="border-b border-gray-200 pb-4">
         <h1 className="text-2xl font-semibold text-gray-900">
-          Bienvenido, Juan Carlos
+          Bienvenido, {user?.nombres} {user?.apellidos}
         </h1>
         <p className="text-gray-600">
           Panel de Administración - {new Date().toLocaleDateString('es-ES', { 
@@ -103,9 +107,9 @@ export const DashboardPage: React.FC = () => {
         <CardContent>
           <div className="space-y-4">
             <div>
-              <h3 className="font-semibold text-lg">TechCorp Solutions</h3>
-              <p className="text-gray-600">RUC: 20123456789</p>
-              <p className="text-gray-600">Av. Principal 123, Lima</p>
+              <h3 className="font-semibold text-lg">{empresa?.nombre_empresa}</h3>
+              <p className="text-gray-600">RUC: {empresa?.ruc}</p>
+              <p className="text-gray-600">{empresa?.direccion}</p>
             </div>
             
             <div>

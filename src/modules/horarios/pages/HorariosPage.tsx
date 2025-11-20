@@ -35,7 +35,7 @@ export const HorariosPage: React.FC = () => {
     nombre_horario: '',
     hora_entrada: '08:00', 
     hora_salida: '17:00', 
-    id_area_trabajo: 0,
+    id_area_trabajo: 1,
     estado: 1
   });
 
@@ -91,8 +91,8 @@ export const HorariosPage: React.FC = () => {
     setNuevoHorario({
       nombre_horario: '',
       hora_entrada: '08:00',
-      hora_salida: '17:00',
-      id_area_trabajo: 0,
+      hora_salida: '13:00',
+      id_area_trabajo: 1,
       estado: 1
     });
     setSelectedSchedule(null);
@@ -100,11 +100,10 @@ export const HorariosPage: React.FC = () => {
 
   const getAreaName = (areaId: number) => {
     const areas = {
-      1: 'Administración',
-      2: 'Recursos Humanos',
-      3: 'Contabilidad',
-      4: 'Sistemas',
-      5: 'Ventas'
+      1: 'Diseño',
+      2: 'Ventas',
+      3: 'Ploteo',
+      4: 'Administración'
     };
     return areas[areaId as keyof typeof areas] || 'Sin área';
   };
