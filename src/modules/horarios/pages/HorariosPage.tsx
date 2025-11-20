@@ -135,7 +135,7 @@ export const HorariosPage: React.FC = () => {
 
   return (
     <div className="p-6 space-y-6">
-      {/* Header */}
+      {/* CABECERA */}
       <div className="flex justify-between items-center border-b border-gray-200 pb-4">
         <div>
           <h1 className="text-2xl font-semibold text-gray-900">Gestión de Horarios</h1>
@@ -227,7 +227,6 @@ export const HorariosPage: React.FC = () => {
         </Dialog>
       </div>
 
-      {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card>
           <CardContent className="p-6">
@@ -268,7 +267,6 @@ export const HorariosPage: React.FC = () => {
         </Card>
       </div>
 
-      {/* Schedules Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {horarios.length === 0 ? (
           <div className="col-span-2 text-center py-12">
@@ -336,7 +334,6 @@ export const HorariosPage: React.FC = () => {
         )}
       </div>
 
-      {/* Edit Schedule Dialog */}
       <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
         <DialogContent className="max-w-md">
           <DialogHeader>

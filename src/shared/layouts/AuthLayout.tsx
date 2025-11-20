@@ -5,7 +5,5 @@ export default function AuthLayout() {
 <div>
     <Outlet />
 </div>
-        
-
     );
 }

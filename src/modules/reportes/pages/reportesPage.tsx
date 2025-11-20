@@ -53,12 +53,12 @@ export const ReportesPage: React.FC = () => {
 
   const totalRegistros = reporte.length;
   const totalTardanzas = reporte.filter(a => a.miniTardanza > 0).length;
-  const totalFaltas = 0; // Esto debería calcularse basado en los empleados activos
+  const totalFaltas = 0;
   const promedioAsistencia = totalRegistros > 0 ? ((totalRegistros - totalTardanzas) / totalRegistros * 100).toFixed(1) : '0';
 
   return (
     <div className="p-6 space-y-6">
-      {/* Header */}
+      {/* CABECERA */}
       <div className="flex justify-between items-center border-b border-gray-200 pb-4">
         <div>
           <h1 className="text-2xl font-semibold text-gray-900">Reportes de Asistencia</h1>
@@ -122,7 +122,7 @@ export const ReportesPage: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Stats Cards */}
+      {/* Tarjetas de Estadisticas */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card>
           <CardContent className="p-6">

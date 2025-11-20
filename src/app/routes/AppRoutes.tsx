@@ -13,7 +13,6 @@ import SucursalPage from "../../modules/sucursales/pages/SucursalPage";
 import ConfiguracionPages from "../../modules/configuracion/pages/ConfiguracionPages";
 import { ReactElement } from "react";
 
-// Componente para protección por roles
 const RoleProtectedRoute = ({ 
   children, 
   allowedRoles 
@@ -43,14 +42,13 @@ export default function AppRoutes() {
     return (
         <BrowserRouter>
             <Routes>
-                {/* Rutas públicas */}
+
                 <Route element={<AuthLayout />}>
                     {AuthRoutes}
                 </Route>
-                
-                {/* Rutas protegidas */}
+
                 <Route element={<AdminLayout />}>
-                    {/* Dashboard - accesible para todos los roles */}
+                    {/* Dashboard para todos los roles */}
                     <Route path="/dashboard" element={
                         <ProtectedRoute>
                             <RoleProtectedRoute allowedRoles={[1, 2]}>
@@ -59,7 +57,7 @@ export default function AppRoutes() {
                         </ProtectedRoute>
                     } />
                     
-                    {/* Empleados - solo Admin */}
+                    {/* Solo Admin */}
                     <Route path="/empleados" element={
                         <ProtectedRoute>
                             <RoleProtectedRoute allowedRoles={[1]}>
@@ -68,7 +66,7 @@ export default function AppRoutes() {
                         </ProtectedRoute>
                     } />
                     
-                    {/* Horarios - solo Admin */}
+                    {/* Solo Admin */}
                     <Route path="/horarios" element={
                         <ProtectedRoute>
                             <RoleProtectedRoute allowedRoles={[1]}>
@@ -77,7 +75,7 @@ export default function AppRoutes() {
                         </ProtectedRoute>
                     } />
                     
-                    {/* Permisos - accesible para todos */}
+                    {/* Para todos */}
                     <Route path="/permisos" element={
                         <ProtectedRoute>
                             <RoleProtectedRoute allowedRoles={[1, 2]}>
@@ -86,7 +84,7 @@ export default function AppRoutes() {
                         </ProtectedRoute>
                     } />
                     
-                    {/* Registro Asistencia - accesible para todos */}
+                    {/* Para todos */}
                     <Route path="/registro" element={
                         <ProtectedRoute>
                             <RoleProtectedRoute allowedRoles={[1, 2]}>
@@ -95,7 +93,7 @@ export default function AppRoutes() {
                         </ProtectedRoute>
                     } />
                     
-                    {/* Reportes - solo Admin */}
+                    {/* Solo Admin */}
                     <Route path="/reportes" element={
                         <ProtectedRoute>
                             <RoleProtectedRoute allowedRoles={[1]}>
@@ -104,7 +102,7 @@ export default function AppRoutes() {
                         </ProtectedRoute>
                     } />
                     
-                    {/* Sucursales - solo Admin */}
+                    {/* Solo Admin */}
                     <Route path="/sucursales" element={
                         <ProtectedRoute>
                             <RoleProtectedRoute allowedRoles={[1]}>
@@ -113,7 +111,7 @@ export default function AppRoutes() {
                         </ProtectedRoute>
                     } />
                     
-                    {/* Configuración - solo Admin */}
+                    {/* Solo Admin */}
                     <Route path="/configuracion" element={
                         <ProtectedRoute>
                             <RoleProtectedRoute allowedRoles={[1]}>

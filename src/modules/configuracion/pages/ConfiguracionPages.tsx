@@ -10,8 +10,7 @@ import { Textarea } from '../../../components/ui/textarea';
 import {
   Settings,
   Building,  
-  Save,
-  RefreshCw
+  Save
 } from 'lucide-react';
 
 export const ConfiguracionPages: React.FC = () => {
@@ -22,8 +21,7 @@ export const ConfiguracionPages: React.FC = () => {
     saving,
     error,
     actualizarConfiguracionEmpresa,
-    actualizarConfiguracionAsistencia,       
-    guardarTodasLasConfiguraciones
+    actualizarConfiguracionAsistencia
   } = useConfiguracion();
 
   const [empresaForm, setEmpresaForm] = useState({
@@ -77,24 +75,7 @@ export const ConfiguracionPages: React.FC = () => {
       alert('Error al guardar la configuración de asistencia');
     }
   };
-  
-  const handleSaveAll = async () => {
-    try {
-      await guardarTodasLasConfiguraciones(
-        empresaForm,
-        asistenciaForm
-      );
-      alert('Todas las configuraciones guardadas exitosamente');
-    } catch (error) {
-      alert('Error al guardar las configuraciones');
-    }
-  };
 
-  const handleResetSettings = () => {
-    if (confirm('¿Estás seguro de que deseas restablecer toda la configuración?')) {      
-      window.location.reload();
-    }
-  };
 
   if (loading) {
     return (
@@ -244,27 +225,7 @@ export const ConfiguracionPages: React.FC = () => {
             </Button>
           </CardContent>
         </Card>
-
-
-      </div>
-      
-      {/* Action Buttons */}
-      <div className="flex justify-between">
-        <Button variant="outline" onClick={handleResetSettings}>
-          <RefreshCw className="w-4 h-4 mr-2" />
-          Restablecer Configuración
-        </Button>
-
-        <div className="space-x-2">
-          <Button variant="outline">
-            Cancelar
-          </Button>
-          <Button onClick={handleSaveAll} disabled={saving}>
-            <Save className="w-4 h-4 mr-2" />
-            {saving ? 'Guardando...' : 'Guardar Todos los Cambios'}
-          </Button>
-        </div>
-      </div>
+      </div>      
     </div>
   );
 };

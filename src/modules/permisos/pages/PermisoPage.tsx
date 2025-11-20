@@ -144,7 +144,7 @@ export const PermisoPage: React.FC = () => {
 
   return (
     <div className="p-6 space-y-6">
-      {/* Header */}
+      {/* cabecera */}
       <div className="flex justify-between items-center border-b border-gray-200 pb-4">
         <div>
           <h1 className="text-2xl font-semibold text-gray-900">Permisos y Justificaciones</h1>
@@ -246,7 +246,6 @@ export const PermisoPage: React.FC = () => {
         </Dialog>
       </div>
 
-      {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card>
           <CardContent className="p-6">
@@ -303,7 +302,7 @@ export const PermisoPage: React.FC = () => {
         </Card>
       </div>
 
-      {/* Permissions List */}
+      {/* Lista de permisos */}
       <Card>
         <CardHeader>
           <CardTitle>Solicitudes de Permisos</CardTitle>

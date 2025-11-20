@@ -136,7 +136,7 @@ export const EmpleadoModal: React.FC<EmpleadoModalProps> = ({
               
               <div className="space-y-3">
                 <div>
-                  <Label htmlFor="dni">DNI *</Label>
+                  <Label htmlFor="dni">DNI</Label>
                   <Input
                     id="dni"
                     value={formData.dni}
@@ -148,7 +148,7 @@ export const EmpleadoModal: React.FC<EmpleadoModalProps> = ({
                 </div>
 
                 <div>
-                  <Label htmlFor="nombres">Nombres *</Label>
+                  <Label htmlFor="nombres">Nombres</Label>
                   <Input
                     id="nombres"
                     value={formData.nombres}
@@ -158,7 +158,7 @@ export const EmpleadoModal: React.FC<EmpleadoModalProps> = ({
                 </div>
 
                 <div>
-                  <Label htmlFor="apellidos">Apellidos *</Label>
+                  <Label htmlFor="apellidos">Apellidos</Label>
                   <Input
                     id="apellidos"
                     value={formData.apellidos}
@@ -168,7 +168,7 @@ export const EmpleadoModal: React.FC<EmpleadoModalProps> = ({
                 </div>
 
                 <div>
-                  <Label htmlFor="email">Email *</Label>
+                  <Label htmlFor="email">Email</Label>
                   <Input
                     id="email"
                     type="email"
@@ -198,7 +198,7 @@ export const EmpleadoModal: React.FC<EmpleadoModalProps> = ({
                 </div>
 
                 <div>
-                  <Label htmlFor="area">Área de Trabajo *</Label>
+                  <Label htmlFor="area">Área de Trabajo</Label>
                   <Select
                     value={formData.id_area_trabajo.toString()}
                     onValueChange={(value: string) => setFormData(prev => ({ 
@@ -227,7 +227,7 @@ export const EmpleadoModal: React.FC<EmpleadoModalProps> = ({
               </div>
             </div>
 
-            {/* Datos de Usuario - Solo para creación */}
+            {/* Datos de Usuario */}
             {!empleado && (
               <div>
                 <h3 className="font-medium text-gray-900 mb-3">Datos de Usuario</h3>
@@ -235,7 +235,7 @@ export const EmpleadoModal: React.FC<EmpleadoModalProps> = ({
                 <div className="space-y-3">
                   <div className="flex gap-2">
                     <div className="flex-1">
-                      <Label htmlFor="nombre_usuario">Nombre de Usuario *</Label>
+                      <Label htmlFor="nombre_usuario">Nombre de Usuario</Label>
                       <Input
                         id="nombre_usuario"
                         value={formData.nombre_usuario}
@@ -254,7 +254,7 @@ export const EmpleadoModal: React.FC<EmpleadoModalProps> = ({
                   </div>
 
                   <div>
-                    <Label htmlFor="contrasena">Contraseña *</Label>
+                    <Label htmlFor="contrasena">Contraseña</Label>
                     <Input
                       id="contrasena"
                       type="password"
@@ -266,7 +266,7 @@ export const EmpleadoModal: React.FC<EmpleadoModalProps> = ({
                   </div>
 
                   <div>
-                    <Label htmlFor="tipo_usuario">Tipo de Usuario *</Label>
+                    <Label htmlFor="tipo_usuario">Tipo de Usuario</Label>
                     <Select
                       value={formData.id_tipo_usuario.toString()}
                       onValueChange={(value: string) => setFormData(prev => ({ ...prev, id_tipo_usuario: parseInt(value) }))}

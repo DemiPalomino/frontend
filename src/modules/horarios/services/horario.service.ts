@@ -23,7 +23,7 @@ export const horarioService = {
     try {
       return await apiFetch("/horarios");
     } catch (error) {
-      console.error('Error fetching horarios:', error);
+      console.error('Error en horarios:', error);
       throw new Error('No se pudieron cargar los horarios');
     }
   },
@@ -32,7 +32,7 @@ export const horarioService = {
     try {
       return await apiFetch(`/horarios/${id}`);
     } catch (error) {
-      console.error(`Error fetching horario ${id}:`, error);
+      console.error(`Error en horario ${id}:`, error);
       throw new Error('No se pudo cargar el horario');
     }
   },
@@ -44,7 +44,7 @@ export const horarioService = {
         body: JSON.stringify(horario),
       });
     } catch (error) {
-      console.error('Error creating horario:', error);
+      console.error('Error al crear horario:', error);
       throw new Error('No se pudo crear el horario');
     }
   },
@@ -56,7 +56,7 @@ export const horarioService = {
         body: JSON.stringify(horario),
       });
     } catch (error) {
-      console.error(`Error updating horario ${id}:`, error);
+      console.error(`Error al actualizar horario ${id}:`, error);
       throw new Error('No se pudo actualizar el horario');
     }
   },
@@ -67,7 +67,7 @@ export const horarioService = {
         method: "DELETE",
       });
     } catch (error) {
-      console.error(`Error deleting horario ${id}:`, error);
+      console.error(`Error al eliminar horario ${id}:`, error);
       throw new Error('No se pudo eliminar el horario');
     }
   },

@@ -1,19 +1,18 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useRegistroAsistencia } from '../controllers/useRegistroAsistencia';
-import { useFaceApi } from '../../../hooks/useFaceApi';
+import { useFaceApi, FaceDetectionResult } from '../../../hooks/useFaceApi';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card';
 import { Button } from '../../../components/ui/button';
 import { Badge } from '../../../components/ui/badge';
 import { Alert, AlertDescription } from '../../../components/ui/alert';
-import { Camera, CameraOff, User, Clock, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
-import { FaceRecognitionAttendance } from '../components/FaceRecognitionAttendance';
+import { Camera, CameraOff, User, Clock, CheckCircle, AlertCircle, Loader2, Save } from 'lucide-react';
 
 export const RegistroAsistenciaPage: React.FC = () => {
   const {
     loading: registroLoading,
     error: registroError,
     ultimoRegistro,
-    registrarAsistenciaFacial,
+    empleadosConDescriptores,
     limpiarEstado
   } = useRegistroAsistencia();
 
@@ -23,88 +22,20 @@ export const RegistroAsistenciaPage: React.FC = () => {
     error: faceError,
     progress,
     loadModels,
-    detectFaces,
-    recognizeFace
+    detectFaces
   } = useFaceApi();
 
   const [cameraActive, setCameraActive] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
+  const [isRegisteringFace, setIsRegisteringFace] = useState(false);
   const [scanResult, setScanResult] = useState<'success' | 'error' | null>(null);
-  const [descriptoresEmpleados, setDescriptoresEmpleados] = useState<Array<{ id: number, descriptor: Float32Array }>>([]);
-  const [empleados, setEmpleados] = useState<Array<{ id_persona: number, nombres: string, apellidos: string, dni: string }>>([]);
+  const [currentUser, setCurrentUser] = useState<{ id: number; nombre: string } | null>(null);
+  const [modoRegistro, setModoRegistro] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
 
 
-  useEffect(() => {
-
-    
-    const cargarDescriptores = async () => {
-      try {
-        console.log('Cargando descriptores de empleados...');
-
-   
-        const { registroAsistenciaService } = await import('../services/registroAsistencia.service');
-        const descriptores = await registroAsistenciaService.obtenerDescriptoresEmpleados();
-
-     
-        const descriptoresFormateados = descriptores.map((emp: any) => ({
-          id: emp.id_persona,
-          descriptor: new Float32Array(emp.descriptor) 
-        }));
-
-        setDescriptoresEmpleados(descriptoresFormateados);
-        setEmpleados(descriptores.map((emp: any) => ({
-          id_persona: emp.id_persona,
-          nombres: emp.nombres,
-          apellidos: emp.apellidos,
-          dni: emp.dni
-        })));
-
-        console.log(`Cargados ${descriptoresFormateados.length} descriptores de empleados`);
-      } catch (error) {
-        console.error('Error cargando descriptores:', error);
-     
-        console.log('Usando datos de prueba para desarrollo...');
-
-        const datosPrueba = [
-          {
-            id_persona: 1,
-            descriptor: Array.from({ length: 128 }, () => Math.random()),
-            nombres: "Admin",
-            apellidos: "Sistema",
-            dni: "12345678"
-          },
-          {
-            id_persona: 2,
-            descriptor: Array.from({ length: 128 }, () => Math.random()),
-            nombres: "Juan Carlos",
-            apellidos: "Pérez López",
-            dni: "87654321"
-          }
-        ];
-
-        const descriptoresFormateados = datosPrueba.map(emp => ({
-          id: emp.id_persona,
-          descriptor: new Float32Array(emp.descriptor)
-        }));
-
-        setDescriptoresEmpleados(descriptoresFormateados);
-        setEmpleados(datosPrueba.map(emp => ({
-          id_persona: emp.id_persona,
-          nombres: emp.nombres,
-          apellidos: emp.apellidos,
-          dni: emp.dni
-        })));
-      }
-    };
-
-    cargarDescriptores();
-  }, []);
-
-  
   const startCamera = async () => {
     try {
       if (!navigator.mediaDevices?.getUserMedia) {
@@ -118,9 +49,6 @@ export const RegistroAsistenciaPage: React.FC = () => {
           throw new Error('No se pudieron cargar los modelos de reconocimiento facial');
         }
       }
-
-      console.log('Solicitando acceso a la cámara...');
-
 
       if (streamRef.current) {
         streamRef.current.getTracks().forEach(track => track.stop());
@@ -138,7 +66,6 @@ export const RegistroAsistenciaPage: React.FC = () => {
         videoRef.current.srcObject = stream;
         streamRef.current = stream;
 
-
         await new Promise((resolve) => {
           if (videoRef.current) {
             videoRef.current.onloadedmetadata = () => {
@@ -154,15 +81,14 @@ export const RegistroAsistenciaPage: React.FC = () => {
       }
     } catch (error: any) {
       console.error('Error accediendo a la cámara:', error);
-
       let errorMessage = 'No se pudo acceder a la cámara.';
 
       if (error.name === 'NotAllowedError') {
-        errorMessage = 'Permisos de cámara denegados. Por favor, permite el acceso a la cámara en la configuración de tu navegador.';
+        errorMessage = 'Permisos de cámara denegados. Por favor, permite el acceso a la cámara.';
       } else if (error.name === 'NotFoundError') {
-        errorMessage = 'No se encontró ninguna cámara conectada. Conecta una cámara e intenta nuevamente.';
+        errorMessage = 'No se encontró ninguna cámara conectada.';
       } else if (error.name === 'NotSupportedError') {
-        errorMessage = 'Tu navegador no soporta acceso a la cámara. Prueba con Chrome, Firefox o Edge.';
+        errorMessage = 'Tu navegador no soporta acceso a la cámara.';
       } else if (error.message.includes('modelos')) {
         errorMessage = error.message;
       }
@@ -171,15 +97,9 @@ export const RegistroAsistenciaPage: React.FC = () => {
     }
   };
 
-
-
   const stopCamera = () => {
     if (streamRef.current) {
-      console.log('Deteniendo cámara...');
-      streamRef.current.getTracks().forEach(track => {
-        track.stop();
-        console.log(`Track ${track.kind} detenido`);
-      });
+      streamRef.current.getTracks().forEach(track => track.stop());
       streamRef.current = null;
     }
 
@@ -189,18 +109,15 @@ export const RegistroAsistenciaPage: React.FC = () => {
 
     setCameraActive(false);
     setIsScanning(false);
+    setIsRegisteringFace(false);
     setScanResult(null);
-    console.log('Cámara completamente detenida');
+    setCurrentUser(null);
+    setModoRegistro(false);
   };
 
-  const scanFace = async () => {
+  const reconocerRostro = async () => {
     if (!videoRef.current || !modelsLoaded) {
-      alert('La cámara o los modelos de IA no están listos. Espera a que se carguen completamente.');
-      return;
-    }
-
-    if (descriptoresEmpleados.length === 0) {
-      alert('No hay empleados registrados en el sistema. Contacta al administrador.');
+      alert('La cámara o los modelos de IA no están listos.');
       return;
     }
 
@@ -209,14 +126,11 @@ export const RegistroAsistenciaPage: React.FC = () => {
     limpiarEstado();
 
     try {
-      console.log('Iniciando proceso de reconocimiento facial...');
-
-
       const faces = await detectFaces(videoRef.current);
 
       if (faces.length === 0) {
         setScanResult('error');
-        alert('No se detectó ningún rostro. Asegúrate de:\n• Estar frente a la cámara\n• Tener buena iluminación\n• Quitar gafas de sol o gorros');
+        alert('No se detectó ningún rostro. Asegúrate de estar frente a la cámara con buena iluminación.');
         return;
       }
 
@@ -227,24 +141,40 @@ export const RegistroAsistenciaPage: React.FC = () => {
       }
 
       const face = faces[0];
-      console.log('✅ Rostro detectado, procediendo a reconocimiento...');
+      const descriptorCapturado = Array.from(face.descriptor);
 
+      // Buscar coincidencia con los descriptores existentes
+      let mejorSimilitud = 1;
+      let empleadoReconocido = null;
 
-      const reconocimiento = await recognizeFace(face.descriptor, descriptoresEmpleados, 0.6);
+      for (const empleado of empleadosConDescriptores) {
+        const descriptorBD = empleado.descriptor;
+        
+        // Calcular distancia euclidiana
+        let distancia = 0;
+        for (let i = 0; i < descriptorCapturado.length; i++) {
+          const diff = descriptorCapturado[i] - descriptorBD[i];
+          distancia += diff * diff;
+        }
+        distancia = Math.sqrt(distancia);
 
-      if (!reconocimiento) {
+        console.log(`Comparando con ${empleado.nombres}: ${distancia}`);
+
+        if (distancia < 0.6 && distancia < mejorSimilitud) {
+          mejorSimilitud = distancia;
+          empleadoReconocido = empleado;
+        }
+      }
+
+      if (!empleadoReconocido) {
         setScanResult('error');
-        alert('No se pudo reconocer el rostro. Posibles causas:\n• No estás registrado en el sistema\n• La iluminación no es adecuada\n• Intenta acercarte más a la cámara');
+        alert('No se reconoció el rostro. Si eres nuevo, registra tu rostro primero.');
         return;
       }
 
-      console.log(`Rostro reconocido: Empleado ID ${reconocimiento.id}`);
-
-     
-      const resultado = await registrarAsistenciaFacial(reconocimiento.id);
-      setScanResult('success');
-
-      console.log('Asistencia registrada exitosamente:', resultado);
+      console.log(`Empleado reconocido: ${empleadoReconocido.nombres} (similitud: ${mejorSimilitud})`);
+      
+      
 
     } catch (error) {
       console.error('Error en el proceso de reconocimiento:', error);
@@ -255,34 +185,64 @@ export const RegistroAsistenciaPage: React.FC = () => {
     }
   };
 
-  const getNombreEmpleado = (id_persona: number) => {
-    const empleado = empleados.find(emp => emp.id_persona === id_persona);
-    return empleado ? `${empleado.nombres} ${empleado.apellidos}` : 'Empleado no encontrado';
-  };
+  const registrarNuevoRostro = async () => {
+    if (!videoRef.current || !modelsLoaded) {
+      alert('La cámara o los modelos de IA no están listos.');
+      return;
+    }
 
-  useEffect(() => {
-    return () => {
-      console.log('🧹 Limpiando recursos de la cámara...');
-      stopCamera();
-    };
-  }, []);
+    const idPersona = prompt('Ingresa tu ID de persona:');
+    if (!idPersona) return;
+
+    setIsRegisteringFace(true);
+    setScanResult(null);
+
+    try {
+      const faces = await detectFaces(videoRef.current);
+
+      if (faces.length === 0) {
+        setScanResult('error');
+        alert('No se detectó ningún rostro. Posiciónate frente a la cámara.');
+        return;
+      }
+
+      if (faces.length > 1) {
+        setScanResult('error');
+        alert('Se detectó más de un rostro. Solo debe haber una persona en cámara.');
+        return;
+      }
+
+      const face = faces[0];
+      const descriptor = Array.from(face.descriptor);
+
+      setScanResult('success');
+      alert('Rostro registrado exitosamente! Ahora puedes usar el reconocimiento facial.');
+      
+      setModoRegistro(false);
+
+    } catch (error) {
+      console.error('Error registrando rostro:', error);
+      setScanResult('error');
+      alert('Error al registrar el rostro. Intenta nuevamente.');
+    } finally {
+      setIsRegisteringFace(false);
+    }
+  };
 
   return (
     <div className="p-6 space-y-6">
-      {/* Header */}
       <div className="border-b border-gray-200 pb-4">
         <h1 className="text-2xl font-semibold text-gray-900">Registro de Asistencia por Reconocimiento Facial</h1>
         <p className="text-gray-600">Sistema automático de registro de entrada y salida</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Sección de Cámara y Reconocimiento */}
-        <FaceRecognitionAttendance />
+        {/* Sección de Cámara */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Camera className="w-5 h-5" />
-              Reconocimiento Facial
+              {modoRegistro ? 'Registro de Rostro' : 'Reconocimiento Facial'}
               {modelsLoading && (
                 <Badge variant="outline" className="ml-2">
                   <Loader2 className="w-3 h-3 animate-spin mr-1" />
@@ -308,21 +268,16 @@ export const RegistroAsistenciaPage: React.FC = () => {
                     muted
                     playsInline
                     className="w-full h-full object-cover transform scale-x-[-1]"
-                    onLoadedMetadata={() => console.log('Video de cámara cargado')}
-                    onError={(e) => console.error('Error en video:', e)}
-                  />
-                  <canvas
-                    ref={canvasRef}
-                    className="absolute top-0 left-0 w-full h-full"
-                    style={{ display: 'none' }}
                   />
 
-                  {isScanning && (
+                  {(isScanning || isRegisteringFace) && (
                     <div className="absolute inset-0 bg-blue-500 bg-opacity-20 flex items-center justify-center">
                       <div className="bg-white p-4 rounded-lg shadow-lg">
                         <div className="flex items-center space-x-2">
                           <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
-                          <span className="font-medium">Reconociendo rostro...</span>
+                          <span className="font-medium">
+                            {isRegisteringFace ? 'Registrando rostro...' : 'Reconociendo rostro...'}
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -333,7 +288,7 @@ export const RegistroAsistenciaPage: React.FC = () => {
                       <Alert className="bg-green-50 border-green-200">
                         <CheckCircle className="h-4 w-4 text-green-600" />
                         <AlertDescription className="text-green-800">
-                          ¡Reconocimiento exitoso! Asistencia registrada correctamente.
+                          {modoRegistro ? '¡Rostro registrado exitosamente!' : '¡Reconocimiento exitoso! Asistencia registrada.'}
                         </AlertDescription>
                       </Alert>
                     </div>
@@ -344,7 +299,7 @@ export const RegistroAsistenciaPage: React.FC = () => {
                       <Alert variant="destructive">
                         <AlertCircle className="h-4 w-4" />
                         <AlertDescription>
-                          Error en el reconocimiento. Verifica las instrucciones e intenta nuevamente.
+                          Error en el proceso. Verifica las instrucciones.
                         </AlertDescription>
                       </Alert>
                     </div>
@@ -359,19 +314,11 @@ export const RegistroAsistenciaPage: React.FC = () => {
                       Cargar Modelos de IA
                     </Button>
                   )}
-                  {faceError && (
-                    <Alert variant="destructive" className="mt-4">
-                      <AlertCircle className="h-4 w-4" />
-                      <AlertDescription className="text-sm">
-                        {faceError}
-                      </AlertDescription>
-                    </Alert>
-                  )}
                 </div>
               )}
             </div>
 
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
               {!cameraActive ? (
                 <Button
                   onClick={startCamera}
@@ -392,21 +339,56 @@ export const RegistroAsistenciaPage: React.FC = () => {
                 </Button>
               ) : (
                 <>
-                  <Button
-                    onClick={scanFace}
-                    disabled={isScanning || !modelsLoaded}
-                    className="flex-1"
-                    variant="default"
-                  >
-                    {isScanning ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Escaneando...
-                      </>
-                    ) : (
-                      'Escanear Rostro'
-                    )}
-                  </Button>
+                  {!modoRegistro ? (
+                    <>
+                      <Button
+                        onClick={reconocerRostro}
+                        disabled={isScanning || !modelsLoaded}
+                        className="flex-1"
+                        variant="default"
+                      >
+                        {isScanning ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Reconociendo...
+                          </>
+                        ) : (
+                          'Reconocer Rostro'
+                        )}
+                      </Button>
+                      <Button 
+                        onClick={() => setModoRegistro(true)}
+                        variant="outline"
+                      >
+                        <Save className="w-4 h-4 mr-2" />
+                        Registrar Rostro
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button
+                        onClick={registrarNuevoRostro}
+                        disabled={isRegisteringFace || !modelsLoaded}
+                        className="flex-1"
+                        variant="default"
+                      >
+                        {isRegisteringFace ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Registrando...
+                          </>
+                        ) : (
+                          'Guardar Rostro'
+                        )}
+                      </Button>
+                      <Button 
+                        onClick={() => setModoRegistro(false)}
+                        variant="outline"
+                      >
+                        Cancelar
+                      </Button>
+                    </>
+                  )}
                   <Button onClick={stopCamera} variant="outline">
                     <CameraOff className="w-4 h-4" />
                   </Button>
@@ -414,62 +396,17 @@ export const RegistroAsistenciaPage: React.FC = () => {
               )}
             </div>
 
-
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-              <h4 className="font-medium text-blue-800 mb-2 text-sm">Estado en Tiempo Real</h4>
-              <div className="grid grid-cols-2 gap-2 text-xs">
-                <div className="flex items-center">
-                  <div className={`w-2 h-2 rounded-full mr-2 ${cameraActive ? 'bg-green-500' : 'bg-gray-400'}`}></div>
-                  <span>Cámara: {cameraActive ? 'Activa' : 'Inactiva'}</span>
-                </div>
-                <div className="flex items-center">
-                  <div className={`w-2 h-2 rounded-full mr-2 ${modelsLoaded ? 'bg-green-500' : modelsLoading ? 'bg-yellow-500' : 'bg-red-500'}`}></div>
-                  <span>Modelos IA: {modelsLoaded ? 'Listos' : modelsLoading ? 'Cargando...' : 'No cargados'}</span>
-                </div>
-                <div className="flex items-center">
-                  <div className={`w-2 h-2 rounded-full mr-2 ${streamRef.current ? 'bg-green-500' : 'bg-gray-400'}`}></div>
-                  <span>Stream: {streamRef.current ? 'Conectado' : 'Desconectado'}</span>
-                </div>
-                <div className="flex items-center">
-                  <div className={`w-2 h-2 rounded-full mr-2 ${videoRef.current?.readyState === 4 ? 'bg-green-500' : 'bg-gray-400'}`}></div>
-                  <span>Video: {videoRef.current?.readyState === 4 ? 'Listo' : 'No listo'}</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <h4 className="font-medium text-blue-800 mb-2">Estado del Sistema</h4>
-              <div className="grid grid-cols-2 gap-2 text-sm">
-                <div>
-                  <span className="text-blue-600">Modelos de IA:</span>
-                  <Badge variant={modelsLoaded ? "secondary" : "outline"} className="ml-2">
-                    {modelsLoaded ? 'Cargados' : modelsLoading ? 'Cargando...' : 'No cargados'}
-                  </Badge>
-                </div>
-                <div>
-                  <span className="text-blue-600">Empleados:</span>
-                  <Badge variant="outline" className="ml-2">
-                    {descriptoresEmpleados.length} registrados
-                  </Badge>
-                </div>
-                <div>
-                  <span className="text-blue-600">Cámara:</span>
-                  <Badge variant={cameraActive ? "secondary" : "outline"} className="ml-2">
-                    {cameraActive ? 'Activa' : 'Inactiva'}
-                  </Badge>
-                </div>
-                <div>
-                  <span className="text-blue-600">Último Scan:</span>
-                  <Badge variant={scanResult === 'success' ? "secondary" : scanResult === 'error' ? "destructive" : "outline"} className="ml-2">
-                    {scanResult === 'success' ? 'Éxito' : scanResult === 'error' ? 'Error' : 'Ninguno'}
-                  </Badge>
-                </div>
-              </div>
-            </div>
+            {modoRegistro && (
+              <Alert className="bg-blue-50 border-blue-200">
+                <AlertDescription className="text-blue-800">
+                  <strong>Modo registro:</strong> Posiciónate frente a la cámara y haz clic en "Guardar Rostro" para registrar tu rostro en el sistema.
+                </AlertDescription>
+              </Alert>
+            )}
           </CardContent>
         </Card>
 
-        {/* Sección de Resultados y Estado */}
+        {/* Sección de Resultados */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -502,14 +439,16 @@ export const RegistroAsistenciaPage: React.FC = () => {
 
             {ultimoRegistro && (
               <div className="border-t pt-4">
-                <h3 className="font-medium mb-3">Último Registro Exitoso</h3>
-                <div className={`border rounded-lg p-4 ${ultimoRegistro.tipo === 'entrada'
-                  ? 'bg-green-50 border-green-200'
-                  : 'bg-blue-50 border-blue-200'
-                  }`}>
+                <h3 className="font-medium mb-3">Último Registro</h3>
+                <div className={`border rounded-lg p-4 ${
+                  ultimoRegistro.tipo === 'entrada' 
+                    ? 'bg-green-50 border-green-200' 
+                    : 'bg-blue-50 border-blue-200'
+                }`}>
                   <div className="flex items-center space-x-3 mb-3">
-                    <div className={`w-12 h-12 rounded-full flex items-center justify-center ${ultimoRegistro.tipo === 'entrada' ? 'bg-green-100' : 'bg-blue-100'
-                      }`}>
+                    <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                      ultimoRegistro.tipo === 'entrada' ? 'bg-green-100' : 'bg-blue-100'
+                    }`}>
                       {ultimoRegistro.tipo === 'entrada' ? (
                         <CheckCircle className="w-6 h-6 text-green-600" />
                       ) : (
@@ -557,11 +496,11 @@ export const RegistroAsistenciaPage: React.FC = () => {
             )}
 
             <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-              <h4 className="font-medium text-green-800 mb-2">Instrucciones Rápidas</h4>
+              <h4 className="font-medium text-green-800 mb-2">Instrucciones</h4>
               <ul className="text-sm text-green-700 space-y-1">
-                <li>• El sistema reconoce automáticamente cada 2 segundos</li>
                 <li>• Solo una persona debe estar frente a la cámara</li>
                 <li>• Mantén buena iluminación frontal</li>
+                <li>• Mira directamente a la cámara</li>
                 <li>• Espera el mensaje de confirmación</li>
               </ul>
             </div>

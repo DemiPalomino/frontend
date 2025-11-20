@@ -38,7 +38,7 @@ export const sucursalService = {
     try {
       return await apiFetch("/sucursales");  
     } catch (error) {
-      console.error('Error fetching sucursales:', error);
+      console.error('Error en sucursales:', error);
       throw new Error('No se pudieron cargar las sucursales');
     }
   },
@@ -47,7 +47,7 @@ export const sucursalService = {
     try {
       return await apiFetch(`/sucursales/${id}`); 
     } catch (error) {
-      console.error(`Error fetching sucursal ${id}:`, error);
+      console.error(`Error en sucursal ${id}:`, error);
       throw new Error('No se pudo cargar la sucursal');
     }
   },
@@ -59,7 +59,7 @@ export const sucursalService = {
         body: JSON.stringify(sucursal),
       });
     } catch (error) {
-      console.error('Error creating sucursal:', error);
+      console.error('Error al crear sucursal:', error);
       throw new Error('No se pudo crear la sucursal');
     }
   },
@@ -71,7 +71,7 @@ export const sucursalService = {
         body: JSON.stringify(sucursal),
       });
     } catch (error) {
-      console.error(`Error updating sucursal ${id}:`, error);
+      console.error(`Error al actualizar sucursal ${id}:`, error);
       throw new Error('No se pudo actualizar la sucursal');
     }
   },
@@ -82,7 +82,7 @@ export const sucursalService = {
         method: "DELETE",
       });
     } catch (error) {
-      console.error(`Error deleting sucursal ${id}:`, error);
+      console.error(`Error al eliminar sucursal ${id}:`, error);
       throw new Error('No se pudo eliminar la sucursal');
     }
   },
@@ -92,7 +92,7 @@ export const sucursalService = {
     try {
       return await apiFetch("/areas"); 
     } catch (error) {
-      console.error('Error fetching areas:', error);
+      console.error('Error en areas:', error);
       throw new Error('No se pudieron cargar las áreas');
     }
   },
@@ -101,7 +101,7 @@ export const sucursalService = {
     try {
       return await apiFetch(`/areas/${id}`);  
     } catch (error) {
-      console.error(`Error fetching area ${id}:`, error);
+      console.error(`Error en area ${id}:`, error);
       throw new Error('No se pudo cargar el área');
     }
   },
@@ -113,7 +113,7 @@ export const sucursalService = {
         body: JSON.stringify(area),
       });
     } catch (error) {
-      console.error('Error creating area:', error);
+      console.error('Error al crear area:', error);
       throw new Error('No se pudo crear el área');
     }
   },
@@ -125,7 +125,7 @@ export const sucursalService = {
         body: JSON.stringify(area),
       });
     } catch (error) {
-      console.error(`Error updating area ${id}:`, error);
+      console.error(`Error al actualizar area ${id}:`, error);
       throw new Error('No se pudo actualizar el área');
     }
   },
@@ -136,7 +136,7 @@ export const sucursalService = {
         method: "DELETE",
       });
     } catch (error) {
-      console.error(`Error deleting area ${id}:`, error);
+      console.error(`Error al eliminar area ${id}:`, error);
       throw new Error('No se pudo eliminar el área');
     }
   },

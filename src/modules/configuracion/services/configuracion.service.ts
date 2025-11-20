@@ -13,7 +13,7 @@ export interface ConfiguracionAsistencia {
   umbral_horas_extra: number;
   registro_automatico_salida: boolean;
 }
-//
+
 export const configuracionService = {
 
 getConfiguracionEmpresa: async (): Promise<ConfiguracionEmpresa> => {
@@ -22,19 +22,14 @@ getConfiguracionEmpresa: async (): Promise<ConfiguracionEmpresa> => {
     const companyData = companies[0];
     
     return {
-      id_empresa: companyData?.id_empresa || 1,
-      nombre_empresa: companyData?.nombre_empresa || "Empresa Demo",
-      ruc: companyData?.ruc || "20123456789",
-      direccion: companyData?.direccion || "Av. Principal 123, Lima"
+      id_empresa: companyData?.id_empresa,
+      nombre_empresa: companyData?.nombre_empresa,
+      ruc: companyData?.ruc,
+      direccion: companyData?.direccion
     };
   } catch (error) {
-    console.error('Error fetching empresa config:', error);
-    return {
-      id_empresa: 1,
-      nombre_empresa: "Empresa Demo",
-      ruc: "20123456789",
-      direccion: "Av. Principal 123, Lima"
-    };
+    console.error('Error en la configuracion de la empresa:', error);
+    throw error;
   }
 },
 
@@ -45,7 +40,7 @@ getConfiguracionEmpresa: async (): Promise<ConfiguracionEmpresa> => {
         body: JSON.stringify(configuracion),
       });
     } catch (error) {
-      console.error('Error updating empresa config:', error);
+      console.error('Error al actualizar la configuracion de la empresa:', error);
       throw new Error('No se pudo actualizar la configuración de la empresa');
     }
   },
@@ -53,7 +48,6 @@ getConfiguracionEmpresa: async (): Promise<ConfiguracionEmpresa> => {
   // Configuración de Asistencia (simulada por ahora)
   getConfiguracionAsistencia: async (): Promise<ConfiguracionAsistencia> => {
     try {
-      // Endpoint no existe aún, retornar valores por defecto
       return {
         tiempo_gracia: 15,
         duracion_descanso: 60,

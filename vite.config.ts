@@ -46,8 +46,8 @@ export default defineConfig({
             '@radix-ui/react-accordion@1.2.3': '@radix-ui/react-accordion',
 
           },
-  },
+  }, 
   optimizeDeps: {
     include: ['react', 'react-dom']
-  }
+  } 
 })

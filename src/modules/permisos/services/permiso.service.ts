@@ -29,7 +29,7 @@ export const permisoService = {
     try {
       return await apiFetch("/permisos");
     } catch (error) {
-      console.error('Error fetching permisos:', error);
+      console.error('Error en permisos:', error);
       throw new Error('No se pudieron cargar los permisos');
     }
   },
@@ -38,7 +38,7 @@ export const permisoService = {
     try {
       return await apiFetch(`/permisos/${id}`);  
     } catch (error) {
-      console.error(`Error fetching permiso ${id}:`, error);
+      console.error(`Error en permiso ${id}:`, error);
       throw new Error('No se pudo cargar el permiso');
     }
   },
@@ -50,7 +50,7 @@ export const permisoService = {
         body: JSON.stringify(permiso),
       });
     } catch (error) {
-      console.error('Error creating permiso:', error);
+      console.error('Error al crear permiso:', error);
       throw new Error('No se pudo crear el permiso');
     }
   },
@@ -62,7 +62,7 @@ export const permisoService = {
         body: JSON.stringify(permiso),
       });
     } catch (error) {
-      console.error(`Error updating permiso ${id}:`, error);
+      console.error(`Error al actualizar permiso ${id}:`, error);
       throw new Error('No se pudo actualizar el permiso');
     }
   },
@@ -73,7 +73,7 @@ export const permisoService = {
         method: "DELETE",
       });
     } catch (error) {
-      console.error(`Error deleting permiso ${id}:`, error);
+      console.error(`Error al elimianr permiso ${id}:`, error);
       throw new Error('No se pudo eliminar el permiso');
     }
   },
