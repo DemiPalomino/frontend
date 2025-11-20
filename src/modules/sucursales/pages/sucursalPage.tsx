@@ -207,7 +207,7 @@ const handleSaveArea = async () => {
                           id="nombre_sucursal"
                           value={nuevaSucursal.nombre_sucursal}
                           onChange={(e) => setNuevaSucursal({ ...nuevaSucursal, nombre_sucursal: e.target.value })}
-                          placeholder="Ej: Sede Central - Lima"
+                          placeholder="Ej: Sucursal A"
                         />
                       </div>
                       <div className="space-y-2">
@@ -225,7 +225,7 @@ const handleSaveArea = async () => {
                           id="telefono"
                           value={nuevaSucursal.telefono}
                           onChange={(e) => setNuevaSucursal({ ...nuevaSucursal, telefono: e.target.value })}
-                          placeholder="01-1234567"
+                          placeholder="985478569"
                         />
                       </div>
                     </div>

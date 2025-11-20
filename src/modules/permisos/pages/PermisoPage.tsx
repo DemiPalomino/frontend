@@ -325,7 +325,7 @@ export const PermisoPage: React.FC = () => {
                         <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
                           <User className="w-6 h-6 text-gray-600" />
                         </div>
-                        <div>{/* {user?.nombres} {user?.apellidos} */}
+                        <div>
                           <h3 className="font-medium">Empleado: {permiso?.nombres} {permiso?.apellidos}</h3>
                           <p className="text-sm text-gray-600">Solicitud #{permiso.id_permiso}</p>
                           <div className="flex items-center space-x-2 mt-1">
