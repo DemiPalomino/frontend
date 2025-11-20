@@ -27,7 +27,7 @@ export const dashboardService = {
     try {
       return await apiFetch("/estadisticas");
     } catch (error) {
-      console.error('Error fetching estadísticas:', error);
+      console.error('Error en estadísticas:', error);
       
       return {
         totalEmpleados: 0,
@@ -47,7 +47,7 @@ export const dashboardService = {
     try {
       return await apiFetch(`/reporte-asistencias?${params.toString()}`);
     } catch (error) {
-      console.error('Error fetching reporte asistencias:', error);
+      console.error('Error en reporte asistencias:', error);
       return [];
     }
   },
@@ -56,7 +56,7 @@ export const dashboardService = {
     try {
       return await apiFetch("/tardanzas-hoy");
     } catch (error) {
-      console.error('Error fetching tardanzas:', error);
+      console.error('Error en tardanzas:', error);
       return [];
     }
   }
