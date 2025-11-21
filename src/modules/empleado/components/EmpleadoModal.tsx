@@ -5,6 +5,8 @@ import { Label } from '../../../components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../components/ui/select';
 import { Empleado, CreateEmpleadoDTO } from '../services/empleado.service';
 import { useAreas } from '../controllers/useAreas';
+import { UserIcon, Lock, Shield } from 'lucide-react';
+import { Dialog, DialogContent, DialogTitle } from '../../../components/ui/dialog';
 
 interface EmpleadoModalProps {
   isOpen: boolean;
@@ -37,7 +39,7 @@ export const EmpleadoModal: React.FC<EmpleadoModalProps> = ({
     // Datos de usuario 
     nombre_usuario: '',
     contrasena: '',
-    id_tipo_usuario: 2 
+    id_tipo_usuario: 2
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -84,13 +86,13 @@ export const EmpleadoModal: React.FC<EmpleadoModalProps> = ({
 
     setLoading(true);
     setError(null);
-    
+
     try {
 
-      const dataToSend = empleado 
+      const dataToSend = empleado
         ? { ...formData, nombre_usuario: undefined, contrasena: undefined, id_tipo_usuario: undefined }
         : formData;
-      
+
       await onSave(dataToSend);
       onClose();
     } catch (error: any) {
@@ -114,12 +116,12 @@ export const EmpleadoModal: React.FC<EmpleadoModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg w-full max-w-md max-h-[90vh] overflow-y-auto">
-        <div className="p-6">
-          <h2 className="text-lg font-semibold mb-4">
-            {empleado ? 'Editar Empleado' : 'Nuevo Empleado'}
-          </h2>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent >
+
+        <div>
+          <DialogTitle> {empleado ? 'Editar Empleado' : 'Nuevo Empleado'}</DialogTitle>
+
 
           {error && (
             <div className="bg-red-50 border border-red-200 rounded-md p-3 mb-4">
@@ -127,12 +129,12 @@ export const EmpleadoModal: React.FC<EmpleadoModalProps> = ({
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit}>
             {/* Datos Personales */}
-            <div className="border-b pb-4">
-              <h3 className="font-medium text-gray-900 mb-3">Datos Personales</h3>
-              
-              <div className="space-y-3">
+            <div>
+              <h3 className="font-medium text-sm text-muted-foreground">Datos Personales</h3>
+
+              <div className="grid grid-cols-2 gap-2">
                 <div>
                   <Label htmlFor="dni">DNI</Label>
                   <Input
@@ -199,9 +201,9 @@ export const EmpleadoModal: React.FC<EmpleadoModalProps> = ({
                   <Label htmlFor="area">Área de Trabajo</Label>
                   <Select
                     value={formData.id_area_trabajo.toString()}
-                    onValueChange={(value: string) => setFormData(prev => ({ 
-                      ...prev, 
-                      id_area_trabajo: parseInt(value) 
+                    onValueChange={(value: string) => setFormData(prev => ({
+                      ...prev,
+                      id_area_trabajo: parseInt(value)
                     }))}
                     disabled={loadingAreas}
                   >
@@ -227,13 +229,15 @@ export const EmpleadoModal: React.FC<EmpleadoModalProps> = ({
 
             {/* Datos de Usuario */}
             {!empleado && (
-              <div>
-                <h3 className="font-medium text-gray-900 mb-3">Datos de Usuario</h3>
-                
+              <div className="space-y-4 pt-2">
+                <h3 className="font-medium text-sm text-gray-900 text-muted-foreground">Datos de Usuario</h3>
                 <div className="space-y-3">
                   <div className="flex gap-2">
                     <div className="flex-1">
-                      <Label htmlFor="nombre_usuario">Nombre de Usuario</Label>
+                      <Label htmlFor="nombre_usuario">
+                        <UserIcon className="w-4 h-4 inline mr-1" />
+                        Nombre de Usuario
+                      </Label>
                       <Input
                         id="nombre_usuario"
                         value={formData.nombre_usuario}
@@ -241,9 +245,9 @@ export const EmpleadoModal: React.FC<EmpleadoModalProps> = ({
                         required
                       />
                     </div>
-                    <Button 
-                      type="button" 
-                      variant="outline" 
+                    <Button
+                      type="button"
+                      variant="outline"
                       onClick={generarNombreUsuario}
                       className="mt-6"
                     >
@@ -252,7 +256,10 @@ export const EmpleadoModal: React.FC<EmpleadoModalProps> = ({
                   </div>
 
                   <div>
-                    <Label htmlFor="contrasena">Contraseña</Label>
+                    <Label htmlFor="contrasena">
+                      <Lock className="w-4 h-4 inline mr-1" />
+                      Contraseña
+                    </Label>
                     <Input
                       id="contrasena"
                       type="password"
@@ -264,7 +271,9 @@ export const EmpleadoModal: React.FC<EmpleadoModalProps> = ({
                   </div>
 
                   <div>
-                    <Label htmlFor="tipo_usuario">Tipo de Usuario</Label>
+                    <Label htmlFor="tipo_usuario">
+                      <Shield className="w-4 h-4 inline mr-1" />
+                      Tipo de Usuario</Label>
                     <Select
                       value={formData.id_tipo_usuario.toString()}
                       onValueChange={(value: string) => setFormData(prev => ({ ...prev, id_tipo_usuario: parseInt(value) }))}
@@ -295,7 +304,10 @@ export const EmpleadoModal: React.FC<EmpleadoModalProps> = ({
             </div>
           </form>
         </div>
-      </div>
-    </div>
+
+      </DialogContent>
+
+    </Dialog>
+
   );
 };

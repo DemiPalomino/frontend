@@ -19,7 +19,7 @@ export default function LoginPage() {
       await login(user, password);
       navigate("/dashboard"); 
     } catch (err: any) {
-      setError(err.message || "Usuario o contraseña incorrectos");
+      setError("Usuario o contraseña incorrectos");
     } finally {
       setIsLoading(false);
     }

@@ -7,6 +7,13 @@ export interface Estadisticas {
   tardanzasHoy: number;
 }
 
+export interface EstadisticasEmpleado {
+  asistenciaHoy: any;
+  tardanzasMes: number;
+  asistenciasMes: number;
+  fechaConsulta: string;
+}
+
 export interface ReporteAsistencia {
   id_asistencia: number;
   id_persona: number;
@@ -25,15 +32,28 @@ export interface ReporteAsistencia {
 export const dashboardService = {
   getEstadisticas: async (): Promise<Estadisticas> => {
     try {
-      return await apiFetch("/estadisticas");
+      return await apiFetch("/dashboard/estadisticas");
     } catch (error) {
       console.error('Error en estadísticas:', error);
-      
       return {
         totalEmpleados: 0,
         asistenciasHoy: 0,
         ausentesHoy: 0,
         tardanzasHoy: 0
+      };
+    }
+  },
+
+  getEstadisticasEmpleado: async (): Promise<EstadisticasEmpleado> => {
+    try {
+      return await apiFetch("/dashboard/estadisticas/empleado");
+    } catch (error) {
+      console.error('Error en estadísticas empleado:', error);
+      return {
+        asistenciaHoy: null,
+        tardanzasMes: 0,
+        asistenciasMes: 0,
+        fechaConsulta: new Date().toISOString()
       };
     }
   },
@@ -45,7 +65,7 @@ export const dashboardService = {
     if (id_area) params.append('id_area', id_area.toString());
 
     try {
-      return await apiFetch(`/reporte-asistencias?${params.toString()}`);
+      return await apiFetch(`/dashboard/reportes/asistencias?${params.toString()}`);
     } catch (error) {
       console.error('Error en reporte asistencias:', error);
       return [];
@@ -54,7 +74,7 @@ export const dashboardService = {
 
   getTardanzasDelDia: async (): Promise<any[]> => {
     try {
-      return await apiFetch("/tardanzas-hoy");
+      return await apiFetch("/dashboard/tardanzas-hoy");
     } catch (error) {
       console.error('Error en tardanzas:', error);
       return [];
