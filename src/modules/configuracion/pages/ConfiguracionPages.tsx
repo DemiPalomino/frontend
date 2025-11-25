@@ -59,13 +59,14 @@ export const ConfiguracionPages: React.FC = () => {
   }, [asistencia]);
   
   const handleSaveEmpresa = async () => {
-    try {
-      await actualizarConfiguracionEmpresa(empresaForm);
-      alert('Configuración de empresa guardada exitosamente');
-    } catch (error) {
-      alert('Error al guardar la configuración de empresa');
-    }
-  };
+  try {
+    await actualizarConfiguracionEmpresa(empresaForm);
+    alert('Configuración de empresa guardada exitosamente');
+    window.location.reload(); 
+  } catch (error) {
+    alert('Error al guardar la configuración de empresa');
+  }
+};
 
   const handleSaveAsistencia = async () => {
     try {
@@ -103,14 +104,14 @@ export const ConfiguracionPages: React.FC = () => {
 
   return (
     <div className="p-6 space-y-6">
-      {/* Header */}
+      {/* Cabecera */}
       <div className="border-b border-gray-200 pb-4">
         <h1 className="text-2xl font-semibold text-gray-900">Configuración del Sistema</h1>
         <p className="text-gray-600">Ajusta los parámetros generales del sistema de control de asistencia</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Company Information */}
+        {/* Informacion de empresa */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -156,7 +157,7 @@ export const ConfiguracionPages: React.FC = () => {
 
         
 
-        {/* Attendance Settings */}
+        {/* Configuracion de asistencia */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">

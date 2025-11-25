@@ -13,6 +13,8 @@ export const RegistroAsistenciaPage: React.FC = () => {
     error: registroError,
     ultimoRegistro,
     empleadosConDescriptores,
+    registrarAsistenciaFacial,
+    registrarDescriptorFacial,
     limpiarEstado
   } = useRegistroAsistencia();
 
@@ -36,133 +38,134 @@ export const RegistroAsistenciaPage: React.FC = () => {
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
-const startCamera = async () => {
-  try {
-    setCameraLoading(true);
-    setCameraError(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  const startCamera = async () => {
+    try {
+      setCameraLoading(true);
+      setCameraError(null);
+
+      if (!navigator.mediaDevices?.getUserMedia) {
+        throw new Error('Tu navegador no soporta acceso a la cámara');
+      }
+
     
-    if (!navigator.mediaDevices?.getUserMedia) {
-      throw new Error('Tu navegador no soporta acceso a la cámara');
-    }
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+        streamRef.current = null;
+      }
 
-    // Detener cámara existente si hay una
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
-    }
+      console.log('Solicitando acceso a la cámara...');
 
-    console.log('Solicitando acceso a la cámara...');
-
-    // Obtener lista de cámaras disponibles ANTES de acceder
-    const devices = await navigator.mediaDevices.enumerateDevices();
-    const videoDevices = devices.filter(device => device.kind === 'videoinput');
-    
-    console.log('=== INFORMACIÓN DE CÁMARAS DISPONIBLES ===');
-    videoDevices.forEach((device, index) => {
-      console.log(`Cámara ${index}:`, device.label || `Dispositivo ${index}`);
-    });
-    console.log('==========================================');
-
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: {
-        width: { ideal: 640 },
-        height: { ideal: 480 }
-        // Sin facingMode para usar la cámara por defecto
-      },
-      audio: false
-    });
-
-    // Obtener información de la cámara que se está usando
-    const videoTrack = stream.getVideoTracks()[0];
-    if (videoTrack) {
-      console.log('=== CÁMARA EN USO ===');
-      console.log('Label:', videoTrack.label);
-      console.log('Settings:', videoTrack.getSettings());
-      console.log('========================');
-    }
-
-    console.log('Cámara accedida correctamente');
-
-    if (!videoRef.current) {
-      throw new Error('Elemento video no encontrado');
-    }
-
-    videoRef.current.srcObject = stream;
-    streamRef.current = stream;
-
-    // Resto de tu código...
-    await new Promise((resolve, reject) => {
+      // VERIFICAR que videoRef existe ANTES de continuar
       if (!videoRef.current) {
-        reject(new Error('Elemento video no encontrado'));
-        return;
+        throw new Error('Elemento video no está disponible en el DOM');
       }
 
-      const videoElement = videoRef.current;
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          width: { ideal: 640 },
+          height: { ideal: 480 },
+          facingMode: 'user' 
+        },
+        audio: false
+      });
 
-      videoElement.onloadedmetadata = () => {
-        console.log('Metadatos del video cargados');
-        resolve(true);
-      };
+      console.log('Stream obtenido:', stream);
 
-      videoElement.onerror = () => {
-        reject(new Error('Error al cargar el video'));
-      };
 
-      setTimeout(() => {
-        if (videoElement.readyState >= 2) {
-          resolve(true);
-        } else {
-          console.warn('Video no completamente cargado, pero continuando...');
-          resolve(true);
+      videoRef.current.srcObject = stream;
+      streamRef.current = stream;
+
+      
+      await new Promise<void>((resolve, reject) => {
+        if (!videoRef.current) {
+          reject(new Error('Elemento video perdido durante la inicialización'));
+          return;
         }
-      }, 3000);
-    });
 
-    if (videoRef.current) {
-      try {
-        await videoRef.current.play();
-        console.log('Video reproduciéndose');
-      } catch (playError) {
-        console.warn('Error en play():', playError);
+        const video = videoRef.current;
+
+        const onLoadedMetadata = () => {
+          console.log('Metadatos cargados - Video listo');
+          video.removeEventListener('loadedmetadata', onLoadedMetadata);
+          resolve();
+        };
+
+        const onError = () => {
+          video.removeEventListener('error', onError);
+          reject(new Error('Error al cargar el video'));
+        };
+
+        video.addEventListener('loadedmetadata', onLoadedMetadata);
+        video.addEventListener('error', onError);
+
+
+        setTimeout(() => {
+          if (video.readyState >= 2) { 
+            console.log('Video listo por timeout');
+            resolve();
+          }
+        }, 2000);
+      });
+
+      if (videoRef.current) {
+        try {
+          await videoRef.current.play();
+          console.log('Video reproduciéndose correctamente');
+        } catch (playError) {
+          console.warn('Error en play(), pero continuando:', playError);
+        }
       }
-    }
 
-    setCameraActive(true);
-    setScanResult(null);
-    limpiarEstado();
-    console.log('Cámara activada y lista');
+      setCameraActive(true);
+      setScanResult(null);
+      limpiarEstado();
+      console.log('✅ Cámara activada exitosamente');
 
-  } catch (error: any) {
-    console.error('Error detallado al acceder a la cámara:', error);
-    let errorMessage = 'No se pudo acceder a la cámara.';
+    } catch (error: any) {
+      console.error('❌ Error detallado al acceder a la cámara:', error);
+      let errorMessage = 'No se pudo acceder a la cámara.';
 
-    if (error.name === 'NotAllowedError') {
-      errorMessage = 'Permisos de cámara denegados. Por favor, permite el acceso a la cámara en la configuración de tu navegador.';
-    } else if (error.name === 'NotFoundError') {
-      errorMessage = 'No se encontró ninguna cámara conectada.';
-    } else if (error.name === 'NotSupportedError') {
-      errorMessage = 'Tu navegador no soporta acceso a la cámara.';
-    } else if (error.name === 'NotReadableError') {
-      errorMessage = 'La cámara está siendo usada por otra aplicación.';
-    } else if (error.name === 'OverconstrainedError') {
-      errorMessage = 'No se puede acceder a la cámara con la configuración solicitada.';
-    }
+      if (error.name === 'NotAllowedError') {
+        errorMessage = 'Permisos de cámara denegados. Por favor, permite el acceso a la cámara en la configuración de tu navegador.';
+      } else if (error.name === 'NotFoundError') {
+        errorMessage = 'No se encontró ninguna cámara conectada.';
+      } else if (error.name === 'NotSupportedError') {
+        errorMessage = 'Tu navegador no soporta acceso a la cámara.';
+      } else if (error.name === 'NotReadableError') {
+        errorMessage = 'La cámara está siendo usada por otra aplicación.';
+      } else if (error.name === 'OverconstrainedError') {
+        errorMessage = 'No se puede acceder a la cámara con la configuración solicitada. Intenta con otra cámara.';
+      } else if (error.message.includes('Elemento video')) {
+        errorMessage = 'Error técnico: El elemento de video no está disponible. Recarga la página.';
+      }
 
-    setCameraError(errorMessage);
-    alert(`Error: ${errorMessage}`);
-  } finally {
-    setCameraLoading(false);
-  }
-};
+      setCameraError(errorMessage);
  
+      alert(`Error de cámara: ${errorMessage}\n\nSi el problema persiste:\n• Recarga la página\n• Verifica los permisos de cámara\n• Prueba en otro navegador`);
+    } finally {
+      setCameraLoading(false);
+    }
+  };
+
+  
+
   useEffect(() => {
     return () => {
       if (streamRef.current) {
-        streamRef.current.getTracks().forEach(track => track.stop());
+        console.log('Limpiando cámara...');
+        streamRef.current.getTracks().forEach(track => {
+          track.stop();
+        });
+        streamRef.current = null;
       }
     };
   }, []);
 
   const stopCamera = () => {
+    console.log('Deteniendo cámara...');
+
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(track => track.stop());
       streamRef.current = null;
@@ -180,54 +183,98 @@ const startCamera = async () => {
     setCurrentUser(null);
     setModoRegistro(false);
     setCameraError(null);
+
+    console.log('Cámara detenida');
   };
 
+  // Función reconocerRostro con registro de asistencia
   const reconocerRostro = async () => {
     if (!videoRef.current || !modelsLoaded) {
       alert('La cámara o los modelos de IA no están listos.');
       return;
     }
+
     setIsScanning(true);
     setScanResult(null);
     limpiarEstado();
+
     try {
+      console.log('Iniciando detección facial...');
       const faces = await detectFaces(videoRef.current);
+
       if (faces.length === 0) {
         setScanResult('error');
         alert('No se detectó ningún rostro. Asegúrate de estar frente a la cámara con buena iluminación.');
         return;
       }
+
       if (faces.length > 1) {
         setScanResult('error');
         alert('Se detectó más de un rostro. Por favor, asegúrate de que solo una persona esté en cámara.');
         return;
       }
+
       const face = faces[0];
       const descriptorCapturado = Array.from(face.descriptor);
+
+      console.log('Descriptor capturado:', descriptorCapturado.length, 'dimensiones');
+      console.log('Empleados para comparar:', empleadosConDescriptores.length);
+
       // Buscar coincidencia con los descriptores existentes
-      let mejorSimilitud = 1;
+      let mejorDistancia = 1;
       let empleadoReconocido = null;
+
       for (const empleado of empleadosConDescriptores) {
-        const descriptorBD = empleado.descriptor;       
-        // Calcular distancia euclidiana
-        let distancia = 0;
-        for (let i = 0; i < descriptorCapturado.length; i++) {
-          const diff = descriptorCapturado[i] - descriptorBD[i];
-          distancia += diff * diff;
-        }
-        distancia = Math.sqrt(distancia);
-        console.log(`Comparando con ${empleado.nombres}: ${distancia}`);
-        if (distancia < 0.6 && distancia < mejorSimilitud) {
-          mejorSimilitud = distancia;
-          empleadoReconocido = empleado;
+        try {
+          const descriptorBD = empleado.descriptor;
+
+          let distancia = 0;
+          for (let i = 0; i < descriptorCapturado.length; i++) {
+            const diff = descriptorCapturado[i] - descriptorBD[i];
+            distancia += diff * diff;
+          }
+          distancia = Math.sqrt(distancia);
+
+          console.log(`Comparando con ${empleado.nombres}: distancia=${distancia.toFixed(4)}`);
+
+          if (distancia < 0.6 && distancia < mejorDistancia) {
+            mejorDistancia = distancia;
+            empleadoReconocido = empleado;
+          }
+        } catch (err) {
+          console.error(`Error comparando con empleado ${empleado.nombres}:`, err);
         }
       }
+
       if (!empleadoReconocido) {
         setScanResult('error');
         alert('No se reconoció el rostro. Si eres nuevo, registra tu rostro primero.');
         return;
       }
-      console.log(`Empleado reconocido: ${empleadoReconocido.nombres} (similitud: ${mejorSimilitud})`);
+
+      console.log(`Empleado reconocido: ${empleadoReconocido.nombres} (distancia: ${mejorDistancia.toFixed(4)})`);
+      setCurrentUser({
+        id: empleadoReconocido.id_persona,
+        nombre: `${empleadoReconocido.nombres} ${empleadoReconocido.apellidos}`
+      });
+
+      //REGISTRAR ASISTENCIA en el backend
+      try {
+        const resultado = await registrarAsistenciaFacial(empleadoReconocido.id_persona);
+        console.log('Asistencia registrada:', resultado);
+        setScanResult('success');
+
+        // Mostrar mensaje de éxito
+        setTimeout(() => {
+          alert(`${resultado.mensaje}\nEmpleado: ${empleadoReconocido.nombres} ${empleadoReconocido.apellidos}\nTipo: ${resultado.tipo === 'entrada' ? 'Entrada' : 'Salida'}`);
+        }, 500);
+
+      } catch (err: any) {
+        console.error('Error registrando asistencia:', err);
+        setScanResult('error');
+        alert(` Error al registrar asistencia: ${err.message}`);
+      }
+
     } catch (error) {
       console.error('Error en el proceso de reconocimiento:', error);
       setScanResult('error');
@@ -237,14 +284,29 @@ const startCamera = async () => {
     }
   };
 
+  // Función registrarNuevoRostro con guardado en BD
   const registrarNuevoRostro = async () => {
     if (!videoRef.current || !modelsLoaded) {
       alert('La cámara o los modelos de IA no están listos.');
       return;
     }
 
-    const idPersona = prompt('Ingresa tu ID de persona:');
-    if (!idPersona) return;
+    const idPersonaInput = prompt('Ingresa tu ID de persona:');
+    if (!idPersonaInput) return;
+
+    const idPersona = parseInt(idPersonaInput);
+    if (isNaN(idPersona)) {
+      alert('ID de persona inválido. Debe ser un número.');
+      return;
+    }
+
+    // Verificar que el ID existe en la lista de empleados
+    const empleadoExistente = empleadosConDescriptores.find(e => e.id_persona === idPersona);
+    if (!empleadoExistente) {
+      if (!confirm(`No se encontró empleado con ID ${idPersona} en la lista actual. ¿Deseas continuar igualmente?`)) {
+        return;
+      }
+    }
 
     setIsRegisteringFace(true);
     setScanResult(null);
@@ -267,19 +329,32 @@ const startCamera = async () => {
       const face = faces[0];
       const descriptor = Array.from(face.descriptor);
 
-      setScanResult('success');
-      alert('Rostro registrado exitosamente! Ahora puedes usar el reconocimiento facial.');
-      
-      setModoRegistro(false);
+      console.log('Registrando descriptor para ID:', idPersona);
 
-    } catch (error) {
+      //REGISTRAR DESCRIPTOR en la base de datos
+      await registrarDescriptorFacial(idPersona, descriptor);
+
+      setScanResult('success');
+
+      setTimeout(() => {
+        alert('Rostro registrado exitosamente! Ahora puedes usar el reconocimiento facial.');
+        setModoRegistro(false);
+      }, 500);
+
+    } catch (error: any) {
       console.error('Error registrando rostro:', error);
       setScanResult('error');
-      alert('Error al registrar el rostro. Intenta nuevamente.');
+      alert(`Error al registrar el rostro: ${error.message}`);
     } finally {
       setIsRegisteringFace(false);
     }
   };
+
+  useEffect(() => {
+    if (cameraActive && empleadosConDescriptores.length === 0) {
+      console.log('Cámara activada - empleados cargados:', empleadosConDescriptores.length);
+    }
+  }, [cameraActive, empleadosConDescriptores.length]);
 
   return (
     <div className="p-6 space-y-6">
@@ -319,66 +394,63 @@ const startCamera = async () => {
             )}
 
             <div className="relative bg-gray-100 rounded-lg overflow-hidden" style={{ aspectRatio: '4/3' }}>
-              {cameraActive ? (
-                <>
-                  <video
-                    ref={videoRef}
-                    autoPlay
-                    muted
-                    playsInline
-                    className="w-full h-full object-cover"
-                    style={{ transform: 'scaleX(-1)' }}
-                    onLoadedData={() => console.log('Video data loaded')}
-                    onCanPlay={() => console.log('Video can play')}
-                    onError={(e) => console.error('Video error:', e)}
-                  />
+              {/* VIDEO SIEMPRE PRESENTE pero controlado por cameraActive */}
+              <video
+                ref={videoRef}
+                autoPlay
+                muted
+                playsInline
+                className={`w-full h-full object-cover ${cameraActive ? 'block' : 'hidden'}`}
+                style={{ transform: 'scaleX(-1)' }}
+              />
 
-                  {/* Estado de carga del video - solo mostrar cuando cameraLoading es true */}
-                  {cameraLoading && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                      <div className="text-white text-center">
-                        <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2" />
-                        <p>Iniciando cámara...</p>
-                      </div>
-                    </div>
-                  )}
+              {/* Estado de carga del video */}
+              {cameraLoading && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                  <div className="text-white text-center">
+                    <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2" />
+                    <p>Iniciando cámara...</p>
+                  </div>
+                </div>
+              )}
 
-                  {(isScanning || isRegisteringFace) && (
-                    <div className="absolute inset-0 bg-blue-500 bg-opacity-20 flex items-center justify-center">
-                      <div className="bg-white p-4 rounded-lg shadow-lg">
-                        <div className="flex items-center space-x-2">
-                          <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
-                          <span className="font-medium">
-                            {isRegisteringFace ? 'Registrando rostro...' : 'Reconociendo rostro...'}
-                          </span>
-                        </div>
-                      </div>
+              {(isScanning || isRegisteringFace) && (
+                <div className="absolute inset-0 bg-blue-500 bg-opacity-20 flex items-center justify-center">
+                  <div className="bg-white p-4 rounded-lg shadow-lg">
+                    <div className="flex items-center space-x-2">
+                      <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
+                      <span className="font-medium">
+                        {isRegisteringFace ? 'Registrando rostro...' : 'Reconociendo rostro...'}
+                      </span>
                     </div>
-                  )}
+                  </div>
+                </div>
+              )}
 
-                  {scanResult === 'success' && (
-                    <div className="absolute top-4 left-4 right-4">
-                      <Alert className="bg-green-50 border-green-200">
-                        <CheckCircle className="h-4 w-4 text-green-600" />
-                        <AlertDescription className="text-green-800">
-                          {modoRegistro ? '¡Rostro registrado exitosamente!' : '¡Reconocimiento exitoso! Asistencia registrada.'}
-                        </AlertDescription>
-                      </Alert>
-                    </div>
-                  )}
+              {scanResult === 'success' && (
+                <div className="absolute top-4 left-4 right-4">
+                  <Alert className="bg-green-50 border-green-200">
+                    <CheckCircle className="h-4 w-4 text-green-600" />
+                    <AlertDescription className="text-green-800">
+                      {modoRegistro ? '¡Rostro registrado exitosamente!' : '¡Reconocimiento exitoso! Asistencia registrada.'}
+                    </AlertDescription>
+                  </Alert>
+                </div>
+              )}
 
-                  {scanResult === 'error' && (
-                    <div className="absolute top-4 left-4 right-4">
-                      <Alert variant="destructive">
-                        <AlertCircle className="h-4 w-4" />
-                        <AlertDescription>
-                          Error en el proceso. Verifica las instrucciones.
-                        </AlertDescription>
-                      </Alert>
-                    </div>
-                  )}
-                </>
-              ) : (
+              {scanResult === 'error' && (
+                <div className="absolute top-4 left-4 right-4">
+                  <Alert variant="destructive">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>
+                      Error en el proceso. Verifica las instrucciones.
+                    </AlertDescription>
+                  </Alert>
+                </div>
+              )}
+
+              {/* PLACEHOLDER cuando la cámara no está activa */}
+              {!cameraActive && (
                 <div className="w-full h-full flex flex-col items-center justify-center p-4">
                   <CameraOff className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                   <p className="text-gray-500 text-center mb-4">Cámara desactivada</p>
@@ -414,7 +486,7 @@ const startCamera = async () => {
                     <>
                       <Button
                         onClick={reconocerRostro}
-                        disabled={isScanning || !modelsLoaded}
+                        disabled={isScanning || !modelsLoaded || empleadosConDescriptores.length === 0}
                         className="flex-1"
                         variant="default"
                       >
@@ -424,10 +496,10 @@ const startCamera = async () => {
                             Reconociendo...
                           </>
                         ) : (
-                          'Reconocer Rostro'
+                          `Reconocer Rostro (${empleadosConDescriptores.length} empleados)`
                         )}
                       </Button>
-                      <Button 
+                      <Button
                         onClick={() => setModoRegistro(true)}
                         variant="outline"
                       >
@@ -452,7 +524,7 @@ const startCamera = async () => {
                           'Guardar Rostro'
                         )}
                       </Button>
-                      <Button 
+                      <Button
                         onClick={() => setModoRegistro(false)}
                         variant="outline"
                       >
@@ -474,10 +546,18 @@ const startCamera = async () => {
                 </AlertDescription>
               </Alert>
             )}
+
+            {cameraActive && empleadosConDescriptores.length === 0 && (
+              <Alert className="bg-yellow-50 border-yellow-200">
+                <AlertDescription className="text-yellow-800">
+                  <strong>Advertencia:</strong> No hay empleados con rostros registrados. Usa "Registrar Rostro" para agregar empleados al sistema.
+                </AlertDescription>
+              </Alert>
+            )}
           </CardContent>
         </Card>
 
-        {/* Sección de Resultados - se mantiene igual */}
+        {/* Sección de Resultados */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -511,15 +591,13 @@ const startCamera = async () => {
             {ultimoRegistro && (
               <div className="border-t pt-4">
                 <h3 className="font-medium mb-3">Último Registro</h3>
-                <div className={`border rounded-lg p-4 ${
-                  ultimoRegistro.tipo === 'entrada' 
-                    ? 'bg-green-50 border-green-200' 
+                <div className={`border rounded-lg p-4 ${ultimoRegistro.tipo === 'entrada'
+                    ? 'bg-green-50 border-green-200'
                     : 'bg-blue-50 border-blue-200'
-                }`}>
+                  }`}>
                   <div className="flex items-center space-x-3 mb-3">
-                    <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                      ultimoRegistro.tipo === 'entrada' ? 'bg-green-100' : 'bg-blue-100'
-                    }`}>
+                    <div className={`w-12 h-12 rounded-full flex items-center justify-center ${ultimoRegistro.tipo === 'entrada' ? 'bg-green-100' : 'bg-blue-100'
+                      }`}>
                       {ultimoRegistro.tipo === 'entrada' ? (
                         <CheckCircle className="w-6 h-6 text-green-600" />
                       ) : (
@@ -544,7 +622,10 @@ const startCamera = async () => {
                     <div>
                       <p className="text-gray-600">Hora:</p>
                       <p className="font-medium">
-                        {new Date(ultimoRegistro.fecha_ingreso!).toLocaleTimeString('es-ES')}
+                        {ultimoRegistro.fecha_ingreso
+                          ? new Date(ultimoRegistro.fecha_ingreso).toLocaleTimeString('es-ES')
+                          : new Date(ultimoRegistro.fecha_salida!).toLocaleTimeString('es-ES')
+                        }
                       </p>
                     </div>
                   </div>
@@ -573,6 +654,7 @@ const startCamera = async () => {
                 <li>• Mantén buena iluminación frontal</li>
                 <li>• Mira directamente a la cámara</li>
                 <li>• Espera el mensaje de confirmación</li>
+                <li>• Empleados registrados: <strong>{empleadosConDescriptores.length}</strong></li>
               </ul>
             </div>
           </CardContent>

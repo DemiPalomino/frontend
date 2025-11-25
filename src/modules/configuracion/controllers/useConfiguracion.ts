@@ -15,10 +15,13 @@ export const useConfiguracion = () => {
   const cargarConfiguracion = async () => {
     try {
       setLoading(true);
+      setError(null);
+      
       const [empresaData, asistenciaData] = await Promise.all([
         configuracionService.getConfiguracionEmpresa(),
         configuracionService.getConfiguracionAsistencia()
       ]);
+      
       setEmpresa(empresaData);
       setAsistencia(asistenciaData);
     } catch (err: any) {
@@ -31,8 +34,11 @@ export const useConfiguracion = () => {
   const actualizarConfiguracionEmpresa = async (configuracion: Partial<ConfiguracionEmpresa>) => {
     try {
       setSaving(true);
+      setError(null);
+      
       const actualizado = await configuracionService.updateConfiguracionEmpresa(configuracion);
       setEmpresa(actualizado);
+      
       return actualizado;
     } catch (err: any) {
       setError(err.message);
@@ -45,28 +51,10 @@ export const useConfiguracion = () => {
   const actualizarConfiguracionAsistencia = async (configuracion: Partial<ConfiguracionAsistencia>) => {
     try {
       setSaving(true);
+      setError(null);
       const actualizado = await configuracionService.updateConfiguracionAsistencia(configuracion);
       setAsistencia(actualizado);
       return actualizado;
-    } catch (err: any) {
-      setError(err.message);
-      throw err;
-    } finally {
-      setSaving(false);
-    }
-  };
-  
-
-  const guardarTodasLasConfiguraciones = async (
-    empresaConfig: Partial<ConfiguracionEmpresa>,
-    asistenciaConfig: Partial<ConfiguracionAsistencia>
-  ) => {
-    try {
-      setSaving(true);
-      await Promise.all([
-        actualizarConfiguracionEmpresa(empresaConfig),
-        actualizarConfiguracionAsistencia(asistenciaConfig)
-      ]);
     } catch (err: any) {
       setError(err.message);
       throw err;
@@ -87,7 +75,6 @@ export const useConfiguracion = () => {
     error,
     actualizarConfiguracionEmpresa,
     actualizarConfiguracionAsistencia,    
-    guardarTodasLasConfiguraciones,
     recargarConfiguracion: cargarConfiguracion,
   };
 };

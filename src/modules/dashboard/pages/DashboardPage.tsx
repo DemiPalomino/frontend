@@ -2,16 +2,16 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card';
 import { Badge } from '../../../components/ui/badge';
 import { useDashboard } from '../controllers/useDashboard';
-import { Users, Clock, CheckCircle, AlertTriangle, Building2, Calendar, UserCheck } from 'lucide-react';
+import { Users, Clock, CheckCircle, AlertTriangle, Building2, Calendar, UserCheck, Loader2 } from 'lucide-react';
 import { useAuth } from "../../../modules/auth/hooks/useAuth";
 import { useConfiguracion } from "../../configuracion/controllers/useConfiguracion";
 
 export const DashboardPage: React.FC = () => {
-  const { estadisticas, estadisticasEmpleado, loading, error, isAdmin } = useDashboard();
+  const { estadisticas, estadisticasEmpleado, loading: dashboardLoading, error: dashboardError, isAdmin } = useDashboard();
   const { user } = useAuth();
-  const { empresa } = useConfiguracion();
+  const { empresa, loading: configLoading } = useConfiguracion();
 
-  if (loading) {
+  if (dashboardLoading) {
     return (
       <div className="p-6 flex items-center justify-center">
         <div className="text-center">
@@ -22,11 +22,11 @@ export const DashboardPage: React.FC = () => {
     );
   }
 
-  if (error) {
+  if (dashboardError) {
     return (
       <div className="p-6">
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <p className="text-red-800">Error: {error}</p>
+          <p className="text-red-800">Error: {dashboardError}</p>
         </div>
       </div>
     );
@@ -148,15 +148,27 @@ export const DashboardPage: React.FC = () => {
           <CardTitle className="flex items-center gap-2">
             <Building2 className="w-5 h-5" />
             Información de la Empresa
+            {configLoading && <Loader2 className="w-4 h-4 animate-spin" />}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            <div>
-              <h3 className="font-semibold text-lg">{empresa?.nombre_empresa}</h3>
-              <p className="text-gray-600">RUC: {empresa?.ruc}</p>
-              <p className="text-gray-600">{empresa?.direccion}</p>
-            </div>
+            {configLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="w-6 h-6 animate-spin mr-2" />
+                <p>Cargando información de la empresa...</p>
+              </div>
+            ) : empresa ? (
+              <div>
+                <h3 className="font-semibold text-lg">{empresa.nombre_empresa}</h3>
+                <p className="text-gray-600">RUC: {empresa.ruc}</p>
+                <p className="text-gray-600">{empresa.direccion}</p>
+              </div>
+            ) : (
+              <div className="text-center py-4 text-gray-500">
+                <p>No se pudo cargar la información de la empresa</p>
+              </div>
+            )}
             
             {isAdmin && (
               <div>

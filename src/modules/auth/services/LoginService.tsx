@@ -1,3 +1,4 @@
+// CORREGIDO - LoginService.tsx
 import { apiFetch } from "../../../app/service/api";
 
 export interface LoginResponse {
@@ -14,18 +15,20 @@ export interface LoginResponse {
 
 export async function LoginService(usuario: string, password: string): Promise<LoginResponse> {
     try {
-        const response = await apiFetch("/login", {
+        const data = await apiFetch("/login", {
             method: "POST",
             body: JSON.stringify({ usuario, password }),
         });
         
-        if (!response.token) {
-            throw new Error('Respuesta inválida del servidor');
+        if (!data.token) {
+            throw new Error('Respuesta inválida del servidor: no se recibió token');
         }
         
-        return response;
+        return data;
     } catch (error: any) {
-        console.error('Error en LoginService:', error);
+        if (error.message.includes('401') || error.message.includes('Credenciales')) {
+            throw new Error('Usuario o contraseña incorrectos');
+        }
         throw new Error(error.message || 'Error de conexión con el servidor');
     }
 }

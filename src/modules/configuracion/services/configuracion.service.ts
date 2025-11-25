@@ -15,32 +15,64 @@ export interface ConfiguracionAsistencia {
 }
 
 export const configuracionService = {
-
-getConfiguracionEmpresa: async (): Promise<ConfiguracionEmpresa> => {
-  try {
-    const companies = await apiFetch("/companies");
-    const companyData = companies[0];
-    
-    return {
-      id_empresa: companyData?.id_empresa,
-      nombre_empresa: companyData?.nombre_empresa,
-      ruc: companyData?.ruc,
-      direccion: companyData?.direccion
-    };
-  } catch (error) {
-    console.error('Error en la configuracion de la empresa:', error);
-    throw error;
-  }
-},
+  getConfiguracionEmpresa: async (): Promise<ConfiguracionEmpresa> => {
+    try {
+      const response = await apiFetch("/companies");
+      
+      if (!response.ok) {
+        throw new Error(`Error ${response.status}: ${response.statusText}`);
+      }
+      
+      const companies = await response.json();
+      
+      const companyData = companies[0];
+      
+      if (!companyData) {
+        return {
+          id_empresa: 1,
+          nombre_empresa: 'Computekk prueba',
+          ruc: '201212121212',
+          direccion: 'Jr. Colonosss'
+        };
+      }
+      
+      return {
+        id_empresa: companyData.id_empresa || 1,
+        nombre_empresa: companyData.nombre_empresa || 'Computekk prueba',
+        ruc: companyData.ruc || '201212121212',
+        direccion: companyData.direccion || 'Jr. Colonosss'
+      };
+    } catch (error) {
+      return {
+        id_empresa: 1,
+        nombre_empresa: 'Computekk prueba',
+        ruc: '201212121212',
+        direccion: 'Jr. Colonosss'
+      };
+    }
+  },
 
   updateConfiguracionEmpresa: async (configuracion: Partial<ConfiguracionEmpresa>): Promise<ConfiguracionEmpresa> => {
     try {
-      return await apiFetch("/companies/1", {
+      
+      const response = await apiFetch("/companies/1", {
         method: "PUT",
         body: JSON.stringify(configuracion),
       });
+      
+      if (!response.ok) {
+        throw new Error(`Error ${response.status}: ${response.statusText}`);
+      }
+      
+      const updatedData = await response.json();
+      
+      return {
+        id_empresa: updatedData.id_empresa || 1,
+        nombre_empresa: updatedData.nombre_empresa || configuracion.nombre_empresa || '',
+        ruc: updatedData.ruc || configuracion.ruc || '',
+        direccion: updatedData.direccion || configuracion.direccion || ''
+      };
     } catch (error) {
-      console.error('Error al actualizar la configuracion de la empresa:', error);
       throw new Error('No se pudo actualizar la configuración de la empresa');
     }
   },
@@ -55,7 +87,7 @@ getConfiguracionEmpresa: async (): Promise<ConfiguracionEmpresa> => {
         registro_automatico_salida: true
       };
     } catch (error) {
-      console.error('Error fetching asistencia config:', error);
+      console.error('Error obteniendo configuración de asistencia:', error);
       return {
         tiempo_gracia: 15,
         duracion_descanso: 60,
@@ -74,7 +106,7 @@ getConfiguracionEmpresa: async (): Promise<ConfiguracionEmpresa> => {
         ...configuracion
       };
     } catch (error) {
-      console.error('Error updating asistencia config:', error);
+      console.error('Error actualizando configuración de asistencia:', error);
       throw new Error('No se pudo actualizar la configuración de asistencia');
     }
   }
