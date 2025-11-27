@@ -6,6 +6,7 @@ import { Button } from '../../../components/ui/button';
 import { Badge } from '../../../components/ui/badge';
 import { Alert, AlertDescription } from '../../../components/ui/alert';
 import { Camera, CameraOff, User, Clock, CheckCircle, AlertCircle, Loader2, Save } from 'lucide-react';
+import { useAuth } from '../../auth/hooks/useAuth';
 
 export const RegistroAsistenciaPage: React.FC = () => {
   const {
@@ -35,6 +36,8 @@ export const RegistroAsistenciaPage: React.FC = () => {
   const [modoRegistro, setModoRegistro] = useState(false);
   const [cameraError, setCameraError] = useState<string | null>(null);
   const [cameraLoading, setCameraLoading] = useState(false);
+
+  const { user } = useAuth(); 
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -291,22 +294,15 @@ export const RegistroAsistenciaPage: React.FC = () => {
       return;
     }
 
-    const idPersonaInput = prompt('Ingresa tu ID de persona:');
-    if (!idPersonaInput) return;
-
-    const idPersona = parseInt(idPersonaInput);
-    if (isNaN(idPersona)) {
-      alert('ID de persona inválido. Debe ser un número.');
+    if (!user?.id_persona) {
+      alert('No se pudo obtener tu información de usuario. Por favor, inicia sesión nuevamente.');
       return;
     }
 
-    // Verificar que el ID existe en la lista de empleados
-    const empleadoExistente = empleadosConDescriptores.find(e => e.id_persona === idPersona);
-    if (!empleadoExistente) {
-      if (!confirm(`No se encontró empleado con ID ${idPersona} en la lista actual. ¿Deseas continuar igualmente?`)) {
-        return;
-      }
-    }
+    const idPersona = user.id_persona;
+    const nombreUsuario = user.nombres && user.apellidos 
+      ? `${user.nombres} ${user.apellidos}`
+      : user.user || 'Usuario';
 
     setIsRegisteringFace(true);
     setScanResult(null);
@@ -337,14 +333,11 @@ export const RegistroAsistenciaPage: React.FC = () => {
       setScanResult('success');
 
       setTimeout(() => {
-        alert('Rostro registrado exitosamente! Ahora puedes usar el reconocimiento facial.');
         setModoRegistro(false);
       }, 500);
 
     } catch (error: any) {
-      console.error('Error registrando rostro:', error);
       setScanResult('error');
-      alert(`Error al registrar el rostro: ${error.message}`);
     } finally {
       setIsRegisteringFace(false);
     }
