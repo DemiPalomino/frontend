@@ -8,6 +8,7 @@ export interface Horario {
   id_area_trabajo: number;
   estado: number;
   nombre_area?: string;
+  empleados_count?: number;
 }
 
 export interface CreateHorarioDTO {

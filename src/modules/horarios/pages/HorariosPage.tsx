@@ -22,6 +22,7 @@ export const HorariosPage: React.FC = () => {
     horarios,
     loading,
     error,
+    areas,
     crearHorario,
     actualizarHorario,
     toggleEstadoHorario
@@ -33,11 +34,20 @@ export const HorariosPage: React.FC = () => {
 
   const [nuevoHorario, setNuevoHorario] = useState({
     nombre_horario: '',
-    hora_entrada: '08:00', 
-    hora_salida: '17:00', 
-    id_area_trabajo: 1,
+    hora_entrada: '08:00',
+    hora_salida: '17:00',
+    id_area_trabajo: areas.length > 0 ? areas[0].id_area : 1,
     estado: 1
   });
+
+  React.useEffect(() => {
+    if (areas.length > 0 && !nuevoHorario.id_area_trabajo) {
+      setNuevoHorario(prev => ({
+        ...prev,
+        id_area_trabajo: areas[0].id_area
+      }));
+    }
+  }, [areas]);
 
   const handleCreateSchedule = async () => {
     try {
@@ -58,8 +68,8 @@ export const HorariosPage: React.FC = () => {
     setSelectedSchedule(horario);
     setNuevoHorario({
       nombre_horario: horario.nombre_horario,
-      hora_entrada: horario.hora_entrada,  
-      hora_salida: horario.hora_salida,    
+      hora_entrada: horario.hora_entrada,
+      hora_salida: horario.hora_salida,
       id_area_trabajo: horario.id_area_trabajo,
       estado: horario.estado
     });
@@ -99,13 +109,8 @@ export const HorariosPage: React.FC = () => {
   };
 
   const getAreaName = (areaId: number) => {
-    const areas = {
-      1: 'Diseño',
-      2: 'Ventas',
-      3: 'Ploteo',
-      4: 'Administración'
-    };
-    return areas[areaId as keyof typeof areas] || 'Sin área';
+    const area = areas.find(a => a.id_area === areaId);
+    return area ? area.nombre_area : `Área ${areaId}`;
   };
 
   if (loading) {
@@ -168,19 +173,23 @@ export const HorariosPage: React.FC = () => {
               <div>
                 <Label htmlFor="area">Área de Trabajo</Label>
                 <Select
-                  value={nuevoHorario.id_area_trabajo.toString()}
-                  onValueChange={(value: string) => setNuevoHorario({ ...nuevoHorario, id_area_trabajo: parseInt(value) })}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecciona un área" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="1">Diseño</SelectItem>
-                    <SelectItem value="2">Ventas</SelectItem>
-                    <SelectItem value="3">Ploteo</SelectItem>
-                    <SelectItem value="4">Administración</SelectItem>
-                  </SelectContent>
-                </Select>
+      value={nuevoHorario.id_area_trabajo.toString()}
+      onValueChange={(value: string) => setNuevoHorario({ 
+        ...nuevoHorario, 
+        id_area_trabajo: parseInt(value) 
+      })}
+    >
+      <SelectTrigger>
+        <SelectValue placeholder="Selecciona un área" />
+      </SelectTrigger>
+      <SelectContent>
+        {areas.map((area) => (
+          <SelectItem key={area.id_area} value={area.id_area.toString()}>
+            {area.nombre_area}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -258,7 +267,9 @@ export const HorariosPage: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Áreas Cubiertas</p>
-                <p className="text-2xl font-semibold text-purple-600">4</p>
+                <p className="text-2xl font-semibold text-purple-600">
+                  {new Set(horarios.map(h => h.id_area_trabajo)).size}
+                </p>
               </div>
               <Users className="w-8 h-8 text-purple-600" />
             </div>
@@ -313,7 +324,7 @@ export const HorariosPage: React.FC = () => {
                       <span className="text-sm text-gray-600">Empleados:</span>
                     </div>
                     <Badge variant="outline">
-                      {Math.floor(Math.random() * 5) + 1} empleados
+                      {horario.empleados_count || 0} empleados
                     </Badge>
                   </div>
 
@@ -355,19 +366,23 @@ export const HorariosPage: React.FC = () => {
               <div>
                 <Label htmlFor="edit-area">Área de Trabajo</Label>
                 <Select
-                  value={nuevoHorario.id_area_trabajo.toString()}
-                  onValueChange={(value: string) => setNuevoHorario({ ...nuevoHorario, id_area_trabajo: parseInt(value) })}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="1">Diseño</SelectItem>
-                    <SelectItem value="2">Ventas</SelectItem>
-                    <SelectItem value="3">Ploteo</SelectItem>
-                    <SelectItem value="4">Administración</SelectItem>
-                  </SelectContent>
-                </Select>
+      value={nuevoHorario.id_area_trabajo.toString()}
+      onValueChange={(value: string) => setNuevoHorario({ 
+        ...nuevoHorario, 
+        id_area_trabajo: parseInt(value) 
+      })}
+    >
+      <SelectTrigger>
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        {areas.map((area) => (
+          <SelectItem key={area.id_area} value={area.id_area.toString()}>
+            {area.nombre_area}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
               </div>
 
               <div className="grid grid-cols-2 gap-4">

@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { horarioService, Horario, CreateHorarioDTO } from '../services/horario.service';
+import { useSucursal } from '../../sucursales/controllers/useSucursal';
 
 export const useHorario = () => {
   const [horarios, setHorarios] = useState<Horario[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { areas, loading: loadingAreas } = useSucursal();
 
   const cargarHorarios = async () => {
     try {
@@ -65,8 +67,9 @@ export const useHorario = () => {
 
   return {
     horarios,
-    loading,
+    loading: loading || loadingAreas,
     error,
+    areas,
     crearHorario,
     actualizarHorario,
     eliminarHorario,

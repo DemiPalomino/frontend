@@ -37,6 +37,11 @@ export const ConfiguracionPages: React.FC = () => {
     registro_automatico_salida: true
   });
 
+  const [saveSuccess, setSaveSuccess] = useState({
+    empresa: false,
+    asistencia: false
+  });
+
   useEffect(() => {
     if (empresa) {
       setEmpresaForm({
@@ -61,8 +66,12 @@ export const ConfiguracionPages: React.FC = () => {
   const handleSaveEmpresa = async () => {
   try {
     await actualizarConfiguracionEmpresa(empresaForm);
-    alert('Configuración de empresa guardada exitosamente');
-    window.location.reload(); 
+    setSaveSuccess(prev => ({ ...prev, empresa: true }));
+      
+      // Ocultar el mensaje de éxito después de 3 segundos
+      setTimeout(() => {
+        setSaveSuccess(prev => ({ ...prev, empresa: false }));
+      }, 3000);
   } catch (error) {
     alert('Error al guardar la configuración de empresa');
   }
@@ -109,6 +118,19 @@ export const ConfiguracionPages: React.FC = () => {
         <h1 className="text-2xl font-semibold text-gray-900">Configuración del Sistema</h1>
         <p className="text-gray-600">Ajusta los parámetros generales del sistema de control de asistencia</p>
       </div>
+
+{/* Mensajes de éxito */}
+      {saveSuccess.empresa && (
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+          <p className="text-green-800">Configuración de empresa guardada exitosamente</p>
+        </div>
+      )}
+
+      {/* {saveSuccess.asistencia && (
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+          <p className="text-green-800">Configuración de asistencia guardada exitosamente</p>
+        </div>
+      )} */}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Informacion de empresa */}

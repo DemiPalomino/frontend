@@ -17,17 +17,12 @@ export interface ConfiguracionAsistencia {
 export const configuracionService = {
   getConfiguracionEmpresa: async (): Promise<ConfiguracionEmpresa> => {
     try {
-      const response = await apiFetch("/companies");
-      
-      if (!response.ok) {
-        throw new Error(`Error ${response.status}: ${response.statusText}`);
-      }
-      
-      const companies = await response.json();
+      const companies = await apiFetch("/companies");
       
       const companyData = companies[0];
       
       if (!companyData) {
+        console.warn('No se encontró información de empresa, usando valores por defecto');
         return {
           id_empresa: 1,
           nombre_empresa: 'Computekk prueba',
@@ -43,6 +38,8 @@ export const configuracionService = {
         direccion: companyData.direccion || 'Jr. Colonosss'
       };
     } catch (error) {
+      console.error('Error obteniendo configuración de empresa:', error);
+      // En caso de error, devuelve valores por defecto
       return {
         id_empresa: 1,
         nombre_empresa: 'Computekk prueba',
@@ -54,17 +51,14 @@ export const configuracionService = {
 
   updateConfiguracionEmpresa: async (configuracion: Partial<ConfiguracionEmpresa>): Promise<ConfiguracionEmpresa> => {
     try {
+      console.log('Enviando datos de empresa:', configuracion);
       
-      const response = await apiFetch("/companies/1", {
+      const updatedData = await apiFetch("/companies/1", {
         method: "PUT",
         body: JSON.stringify(configuracion),
       });
       
-      if (!response.ok) {
-        throw new Error(`Error ${response.status}: ${response.statusText}`);
-      }
-      
-      const updatedData = await response.json();
+      console.log('Datos actualizados recibidos:', updatedData);
       
       return {
         id_empresa: updatedData.id_empresa || 1,
@@ -73,6 +67,7 @@ export const configuracionService = {
         direccion: updatedData.direccion || configuracion.direccion || ''
       };
     } catch (error) {
+      console.error('Error actualizando configuración de empresa:', error);
       throw new Error('No se pudo actualizar la configuración de la empresa');
     }
   },
@@ -99,12 +94,17 @@ export const configuracionService = {
 
   updateConfiguracionAsistencia: async (configuracion: Partial<ConfiguracionAsistencia>): Promise<ConfiguracionAsistencia> => {
     try {
-      // Simular actualización
+      // Simular actualización - cuando implementes el backend, reemplaza esto con una llamada real
       const current = await configuracionService.getConfiguracionAsistencia();
-      return {
+      const updated = {
         ...current,
         ...configuracion
       };
+      
+      // Simular delay de red
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      return updated;
     } catch (error) {
       console.error('Error actualizando configuración de asistencia:', error);
       throw new Error('No se pudo actualizar la configuración de asistencia');
