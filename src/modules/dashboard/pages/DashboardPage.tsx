@@ -5,9 +5,17 @@ import { useDashboard } from '../controllers/useDashboard';
 import { Users, Clock, CheckCircle, AlertTriangle, Building2, Calendar, UserCheck, Loader2 } from 'lucide-react';
 import { useAuth } from "../../../modules/auth/hooks/useAuth";
 import { useConfiguracion } from "../../configuracion/controllers/useConfiguracion";
+import { AreaConEmpleados } from '../services/dashboard.service';
 
 export const DashboardPage: React.FC = () => {
-  const { estadisticas, estadisticasEmpleado, loading: dashboardLoading, error: dashboardError, isAdmin } = useDashboard();
+const { 
+    estadisticas, 
+    estadisticasEmpleado, 
+    areas,
+    loading: dashboardLoading, 
+    error: dashboardError, 
+    isAdmin 
+  } = useDashboard();  
   const { user } = useAuth();
   const { empresa, loading: configLoading } = useConfiguracion();
 
@@ -40,16 +48,15 @@ export const DashboardPage: React.FC = () => {
           Bienvenido, {user?.nombres} {user?.apellidos}
         </h1>
         <p className="text-gray-600">
-          {isAdmin ? 'Panel de Administración' : 'Mi Panel Personal'} - {new Date().toLocaleDateString('es-ES', { 
-            weekday: 'long', 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric' 
+          {isAdmin ? 'Panel de Administración' : 'Mi Panel Personal'} - {new Date().toLocaleDateString('es-ES', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
           })}
         </p>
       </div>
 
-      {/* Stats Cards */}
       {isAdmin ? (
         // Dashboard Administrador
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -110,8 +117,8 @@ export const DashboardPage: React.FC = () => {
                 {estadisticasEmpleado?.asistenciaHoy ? 'Registrada' : 'Pendiente'}
               </div>
               <p className="text-xs text-muted-foreground">
-                {estadisticasEmpleado?.asistenciaHoy ? 
-                  `Hora: ${new Date(estadisticasEmpleado.asistenciaHoy.fecha_ingreso).toLocaleTimeString()}` : 
+                {estadisticasEmpleado?.asistenciaHoy ?
+                  `Hora: ${new Date(estadisticasEmpleado.asistenciaHoy.fecha_ingreso).toLocaleTimeString()}` :
                   'Aún no registras asistencia'
                 }
               </p>
@@ -169,32 +176,20 @@ export const DashboardPage: React.FC = () => {
                 <p>No se pudo cargar la información de la empresa</p>
               </div>
             )}
-            
+
             {isAdmin && (
               <div>
                 <h4 className="font-medium mb-2">Áreas de Trabajo</h4>
                 <div className="space-y-2">
-                  <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
-                    <div>
-                      <p className="font-medium">Desarrollo</p>
-                      <p className="text-sm text-gray-500">Área de desarrollo de software</p>
+                  {areas.map((area: AreaConEmpleados) => (
+                    <div key={area.id_area} className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                      <div>
+                        <p className="font-medium">{area.nombre_area}</p>
+                        <p className="text-sm text-gray-500">{area.descripcion}</p>
+                      </div>
+                      <Badge variant="secondary">{area.cantidad_empleados} empleados</Badge>
                     </div>
-                    <Badge variant="secondary">2 empleados</Badge>
-                  </div>
-                  <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
-                    <div>
-                      <p className="font-medium">Marketing</p>
-                      <p className="text-sm text-gray-500">Área de marketing y ventas</p>
-                    </div>
-                    <Badge variant="secondary">1 empleados</Badge>
-                  </div>
-                  <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
-                    <div>
-                      <p className="font-medium">Recursos Humanos</p>
-                      <p className="text-sm text-gray-500">Gestión de personal y recursos humanos</p>
-                    </div>
-                    <Badge variant="secondary">1 empleados</Badge>
-                  </div>
+                  ))}
                 </div>
               </div>
             )}
@@ -226,8 +221,8 @@ export const DashboardPage: React.FC = () => {
               <div>
                 <p className="text-sm font-medium">Tardanza</p>
                 <p className="text-lg">
-                  {estadisticasEmpleado.asistenciaHoy.miniTardanza > 0 ? 
-                    `${estadisticasEmpleado.asistenciaHoy.miniTardanza} min` : 
+                  {estadisticasEmpleado.asistenciaHoy.miniTardanza > 0 ?
+                    `${estadisticasEmpleado.asistenciaHoy.miniTardanza} min` :
                     'Sin tardanza'
                   }
                 </p>

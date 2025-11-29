@@ -74,9 +74,6 @@ export const RegistroAsistenciaPage: React.FC = () => {
         audio: false
       });
 
-      console.log('Stream obtenido:', stream);
-
-
       videoRef.current.srcObject = stream;
       streamRef.current = stream;
 
@@ -124,10 +121,10 @@ export const RegistroAsistenciaPage: React.FC = () => {
       setCameraActive(true);
       setScanResult(null);
       limpiarEstado();
-      console.log('✅ Cámara activada exitosamente');
+      console.log('Cámara activada exitosamente');
 
     } catch (error: any) {
-      console.error('❌ Error detallado al acceder a la cámara:', error);
+      console.error('Error detallado al acceder a la cámara:', error);
       let errorMessage = 'No se pudo acceder a la cámara.';
 
       if (error.name === 'NotAllowedError') {

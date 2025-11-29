@@ -39,7 +39,6 @@ export const configuracionService = {
       };
     } catch (error) {
       console.error('Error obteniendo configuración de empresa:', error);
-      // En caso de error, devuelve valores por defecto
       return {
         id_empresa: 1,
         nombre_empresa: 'Computekk prueba',
@@ -50,15 +49,11 @@ export const configuracionService = {
   },
 
   updateConfiguracionEmpresa: async (configuracion: Partial<ConfiguracionEmpresa>): Promise<ConfiguracionEmpresa> => {
-    try {
-      console.log('Enviando datos de empresa:', configuracion);
-      
+    try {      
       const updatedData = await apiFetch("/companies/1", {
         method: "PUT",
         body: JSON.stringify(configuracion),
       });
-      
-      console.log('Datos actualizados recibidos:', updatedData);
       
       return {
         id_empresa: updatedData.id_empresa || 1,

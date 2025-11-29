@@ -68,7 +68,6 @@ export const ConfiguracionPages: React.FC = () => {
     await actualizarConfiguracionEmpresa(empresaForm);
     setSaveSuccess(prev => ({ ...prev, empresa: true }));
       
-      // Ocultar el mensaje de éxito después de 3 segundos
       setTimeout(() => {
         setSaveSuccess(prev => ({ ...prev, empresa: false }));
       }, 3000);

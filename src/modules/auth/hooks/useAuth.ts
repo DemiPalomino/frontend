@@ -17,7 +17,7 @@ export function useAuth() {
                 setUser(JSON.parse(storedUser));
                 setToken(storedToken);
             } catch (error) {
-                console.error('Error parsing stored user:', error);
+                console.error('Error parseando el usuario:', error);
                 localStorage.removeItem("user");
                 localStorage.removeItem("Token");
             }

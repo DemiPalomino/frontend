@@ -52,7 +52,7 @@ export const registroAsistenciaService = {
       return data;
       
     } catch (error: any) {
-      console.error('❌ Error completo en obtenerEmpleadosConDescriptores:', error);
+      console.error('Error completo en obtenerEmpleadosConDescriptores:', error);
       
       if (error.message.includes('Failed to fetch')) {
         throw new Error('No se pudo conectar con el servidor. Verifica tu conexión.');

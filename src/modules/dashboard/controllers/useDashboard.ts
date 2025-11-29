@@ -1,36 +1,40 @@
 import { useState, useEffect } from 'react';
-import { dashboardService, Estadisticas, ReporteAsistencia, EstadisticasEmpleado } from '../services/dashboard.service';
+import { dashboardService, Estadisticas, ReporteAsistencia, EstadisticasEmpleado, AreaConEmpleados } from '../services/dashboard.service';
 import { useAuth } from "../../../modules/auth/hooks/useAuth";
 
 export const useDashboard = () => {
   const [estadisticas, setEstadisticas] = useState<Estadisticas | null>(null);
   const [estadisticasEmpleado, setEstadisticasEmpleado] = useState<EstadisticasEmpleado | null>(null);
   const [reporteAsistencias, setReporteAsistencias] = useState<ReporteAsistencia[]>([]);
+  const [areas, setAreas] = useState<AreaConEmpleados[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
   const { user } = useAuth();
   const isAdmin = user?.role === 1;
 
-  const cargarEstadisticas = async () => {
+const cargarEstadisticas = async () => {
     try {
-      setLoading(true);
-      setError(null);
-      
-      if (isAdmin) {
-        const data = await dashboardService.getEstadisticas();
-        setEstadisticas(data);
-      } else {
-        const data = await dashboardService.getEstadisticasEmpleado();
-        setEstadisticasEmpleado(data);
-      }
+        setLoading(true);
+        setError(null);
+        
+        if (isAdmin) {
+            const [dataEstadisticas, dataAreas] = await Promise.all([
+                dashboardService.getEstadisticas(),
+                dashboardService.getAreasConEmpleados()
+            ]);
+            setEstadisticas(dataEstadisticas);
+            setAreas(dataAreas);
+        } else {
+            const data = await dashboardService.getEstadisticasEmpleado();
+            setEstadisticasEmpleado(data);
+        }
     } catch (err: any) {
-      setError(err.message || 'Error al cargar estadísticas');
-      console.error('Error en useDashboard:', err);
+        setError(err.message || 'Error al cargar estadísticas');
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
-  };
+};
 
   const cargarReporteAsistencias = async (fecha_inicio?: string, fecha_fin?: string, id_area?: number) => {
     try {
@@ -54,6 +58,7 @@ export const useDashboard = () => {
     estadisticas,
     estadisticasEmpleado,
     reporteAsistencias,
+    areas,
     loading,
     error,
     isAdmin,

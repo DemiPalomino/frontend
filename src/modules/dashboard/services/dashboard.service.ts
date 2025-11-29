@@ -29,18 +29,20 @@ export interface ReporteAsistencia {
   nombre_area: string;
 }
 
+export interface AreaConEmpleados {
+  id_area: number;
+  nombre_area: string;
+  descripcion: string;
+  cantidad_empleados: number;
+}
+
 export const dashboardService = {
   getEstadisticas: async (): Promise<Estadisticas> => {
     try {
       return await apiFetch("/dashboard/estadisticas");
     } catch (error) {
       console.error('Error en estadísticas:', error);
-      return {
-        totalEmpleados: 0,
-        asistenciasHoy: 0,
-        ausentesHoy: 0,
-        tardanzasHoy: 0
-      };
+      throw error;
     }
   },
 
@@ -49,12 +51,7 @@ export const dashboardService = {
       return await apiFetch("/dashboard/estadisticas/empleado");
     } catch (error) {
       console.error('Error en estadísticas empleado:', error);
-      return {
-        asistenciaHoy: null,
-        tardanzasMes: 0,
-        asistenciasMes: 0,
-        fechaConsulta: new Date().toISOString()
-      };
+      throw error;
     }
   },
 
@@ -68,16 +65,16 @@ export const dashboardService = {
       return await apiFetch(`/dashboard/reportes/asistencias?${params.toString()}`);
     } catch (error) {
       console.error('Error en reporte asistencias:', error);
-      return [];
+      throw error;
     }
   },
 
-  getTardanzasDelDia: async (): Promise<any[]> => {
+  getAreasConEmpleados: async (): Promise<AreaConEmpleados[]> => {
     try {
-      return await apiFetch("/dashboard/tardanzas-hoy");
+      return await apiFetch("/dashboard/areas");
     } catch (error) {
-      console.error('Error en tardanzas:', error);
-      return [];
+      console.error('Error en áreas con empleados:', error);
+      throw error;
     }
   }
 };

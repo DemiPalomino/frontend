@@ -173,23 +173,23 @@ export const HorariosPage: React.FC = () => {
               <div>
                 <Label htmlFor="area">Área de Trabajo</Label>
                 <Select
-      value={nuevoHorario.id_area_trabajo.toString()}
-      onValueChange={(value: string) => setNuevoHorario({ 
-        ...nuevoHorario, 
-        id_area_trabajo: parseInt(value) 
-      })}
-    >
-      <SelectTrigger>
-        <SelectValue placeholder="Selecciona un área" />
-      </SelectTrigger>
-      <SelectContent>
-        {areas.map((area) => (
-          <SelectItem key={area.id_area} value={area.id_area.toString()}>
-            {area.nombre_area}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+                  value={nuevoHorario.id_area_trabajo.toString()}
+                  onValueChange={(value: string) => setNuevoHorario({
+                    ...nuevoHorario,
+                    id_area_trabajo: parseInt(value)
+                  })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecciona un área" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {areas.map((area) => (
+                      <SelectItem key={area.id_area} value={area.id_area.toString()}>
+                        {area.nombre_area}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -366,23 +366,23 @@ export const HorariosPage: React.FC = () => {
               <div>
                 <Label htmlFor="edit-area">Área de Trabajo</Label>
                 <Select
-      value={nuevoHorario.id_area_trabajo.toString()}
-      onValueChange={(value: string) => setNuevoHorario({ 
-        ...nuevoHorario, 
-        id_area_trabajo: parseInt(value) 
-      })}
-    >
-      <SelectTrigger>
-        <SelectValue />
-      </SelectTrigger>
-      <SelectContent>
-        {areas.map((area) => (
-          <SelectItem key={area.id_area} value={area.id_area.toString()}>
-            {area.nombre_area}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+                  value={nuevoHorario.id_area_trabajo.toString()}
+                  onValueChange={(value: string) => setNuevoHorario({
+                    ...nuevoHorario,
+                    id_area_trabajo: parseInt(value)
+                  })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {areas.map((area) => (
+                      <SelectItem key={area.id_area} value={area.id_area.toString()}>
+                        {area.nombre_area}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
